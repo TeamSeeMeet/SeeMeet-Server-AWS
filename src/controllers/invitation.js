@@ -295,7 +295,6 @@ const postInvitation = async (req, res) => {
     const dates = await invitationService.createInvitationDate(client, invitationId, date, start, end);
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.INVITATION_SUCCESS, { invitation, guests, dates }));
   } catch (error) {
-    functions.logger.error(`[ERROR] [${req.method.toUpperCase()}] ${req.originalUrl}`, `[CONTENT] ${error}`);
     console.log(error);
     await send(error);
 

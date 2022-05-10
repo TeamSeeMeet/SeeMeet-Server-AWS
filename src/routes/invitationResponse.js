@@ -1,8 +1,7 @@
 const express = require('express');
-const auth = require('../controllers/auth');
+const invitationResponse = require('../controllers/invitationResponse');
 const router = express.Router();
 
-router.post('/social', auth.authSocialLogin);
-router.put('/', auth.authSignup);
-
+router.post('/:invitationId', invitationResponse.responseInvitation);
+router.post('/:invitationId/reject', invitationResponse.rejectInvitation);
 module.exports = router;

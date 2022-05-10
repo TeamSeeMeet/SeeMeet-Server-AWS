@@ -1,6 +1,6 @@
 const _ = require('lodash');
-const convertSnakeToCamel = require('../lib/convertSnakeToCamel');
 const dayjs = require('dayjs');
+const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
 
 const getMonthPlan = async (client, userId, year, month) => {
   const { rows } = await client.query(

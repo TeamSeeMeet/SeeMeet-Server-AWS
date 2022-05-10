@@ -227,7 +227,7 @@ const getPlan3Month = async (req, res) => {
   }
 };
 
-module.export = {
+module.exports = {
   getPlanCome,
   getPlanByDate,
   deletePlan,

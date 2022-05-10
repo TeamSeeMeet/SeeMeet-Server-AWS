@@ -1,4 +1,4 @@
-// const user = require('./user');
+const user = require('./user');
 const auth = require('./auth');
 const friend = require('./friend');
 const plan = require('./plan');

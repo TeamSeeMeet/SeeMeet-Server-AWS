@@ -1,9 +1,9 @@
 {
   "apps": [
     {
-      "name": "moditAdmin-Backend",
-      "script": "./node_modules/.bin/ts-node",
-      "args": "./src/index.ts",
+      "name": "seemeet",
+      "script": "./src/index.js",
+      "args": "./src/index.js",
       "watch": true
     }
   ]

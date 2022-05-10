@@ -2,7 +2,7 @@
   "apps": [
     {
       "name": "seemeet",
-      "script": "./src/index.js",
+      "script": "./node_modules",
       "args": "./src/index.js",
       "watch": true
     }

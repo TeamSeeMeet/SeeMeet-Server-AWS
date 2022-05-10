@@ -6,6 +6,6 @@ router.get('/list', friend.getFriend);
 router.post('/search', friend.searchFriend);
 router.post('/addFriend', friend.addFriend);
 router.put('/block', friend.blockFriend);
-router.put('/cancelblock', friend.cancleBlockFriend);
+router.put('/cancelblock', friend.cancelBlockFriend);
 
 module.exports = router;

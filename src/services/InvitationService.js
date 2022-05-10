@@ -3,7 +3,6 @@ const { response, query } = require('express');
 const _ = require('lodash');
 // const { host } = require('../config/dbConfig');
 const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
-const _ = require('lodash');
 
 const getAllInvitation = async (client, userId) => {
   const { rows } = await client.query(

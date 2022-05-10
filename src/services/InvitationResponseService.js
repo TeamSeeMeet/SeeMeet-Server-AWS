@@ -1,6 +1,6 @@
 const dayjs = require('dayjs');
 const _ = require('lodash');
-const converSnakeToCamel = require('../lib/convertSnakeToCamel');
+const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
 
 const responseInvitation = async (client, userId, invitationId, invitationDateIds) => {
   const responseRows = [];

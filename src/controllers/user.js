@@ -5,9 +5,6 @@ const db = require('../db/db');
 const jwtHandlers = require('../modules/jwtHandlers');
 const userService = require('../services/UserService');
 const friendService = require('../services/FriendService');
-const { send } = require('../modules/slack');
-const axios = require('axios');
-const jwt = require('jsonwebtoken');
 
 const deleteUser = async (req, res) => {
   const { accesstoken } = req.headers;

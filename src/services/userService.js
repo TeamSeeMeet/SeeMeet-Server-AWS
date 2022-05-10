@@ -1,4 +1,6 @@
 const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
+const _ = require('lodash');
+const axios = require('axios');
 
 const deleteUser = async (client, userId) => {
   const { rows } = await client.query(

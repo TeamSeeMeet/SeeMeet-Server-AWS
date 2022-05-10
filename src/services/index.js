@@ -1,3 +1,3 @@
 module.exports = {
-  userService: require('./userService'),
+  userService: require('./UserService'),
 };

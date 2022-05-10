@@ -106,7 +106,7 @@ const blockFriend = async (req, res) => {
   }
 };
 
-const cancleBlockFriend = async (req, res) => {
+const cancelBlockFriend = async (req, res) => {
   const { accesstoken } = req.headers;
   const { nickname } = req.body;
   if (!nickname) {
@@ -240,7 +240,7 @@ const searchFriend = async (req, res) => {
 module.exports = {
   addFriend,
   blockFriend,
-  cancleBlockFriend,
+  cancelBlockFriend,
   getFriend,
   searchFriend,
 };

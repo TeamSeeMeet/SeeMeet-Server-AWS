@@ -4,6 +4,7 @@ const responseMessage = require('../modules/responseMessage');
 const db = require('../db/db');
 const jwtHandlers = require('../modules/jwtHandlers');
 const friendService = require('../services/FriendService');
+const userService = require('../services/UserService');
 const { send } = require('../modules/slack');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
@@ -174,7 +175,7 @@ const getFriend = async (req, res) => {
     const checknull = friendList == '';
     if (checknull == true) return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.READ_USER_SUCCESS, []));
     const rId = [...new Set(friendList.filter(Boolean).map(o => o.receiver))];
-    const friendinfo = await userDB.getUserinfoByuserIds(client, rId);
+    const friendinfo = await userService.getUserinfoByuserIds(client, rId);
     if (!friendinfo) {
       await send(`receiverId : ${rId}`);
       return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));

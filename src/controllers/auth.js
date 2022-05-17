@@ -5,9 +5,7 @@ const db = require('../db/db');
 const jwtHandlers = require('../modules/jwtHandlers');
 const userService = require('../services/UserService');
 const { send } = require('../modules/slack');
-const axios = require('axios');
 const jwt = require('jsonwebtoken');
-const admin = require('firebase-admin');
 
 const authSocialLogin = async (req, res) => {
   const { socialtoken, provider, name } = req.body;

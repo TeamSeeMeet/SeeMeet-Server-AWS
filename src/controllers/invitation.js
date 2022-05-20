@@ -7,6 +7,7 @@ const invitationService = require('../services/InvitationService');
 const { send } = require('../modules/slack');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
+const userService = require('../services/userService')
 
 const getCanceledInvitation = async (req, res) => {
   const { invitationId } = req.params;
@@ -275,7 +276,7 @@ const postInvitation = async (req, res) => {
     }
 
     for (let guest of guests) {
-      let user = await userDB.getUserinfoByuserIds(client, [guest.id]);
+      let user = await userService.getUserinfoByuserIds(client, [guest.id]);
       if (user.length == 0) {
         await send(`
           req.originalURL: ${req.originalUrl}

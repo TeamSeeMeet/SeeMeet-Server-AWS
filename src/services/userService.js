@@ -132,6 +132,19 @@ const checkUserInfo = async (client, nickname) => {
   return 1;
 };
 
+const userWithdrawal = async (client, userId) => {
+  const { rows } = await client.query(
+    `
+    UPDATE "user"
+    SET is_deleted = true
+    WHERE id = $1
+    RETURNING *
+    `,
+    [userId],
+  );
+  return convertSnakeToCamel.keysToCamel(rows[0]);
+};
+
 module.exports = {
   deleteUser,
   addUser,
@@ -143,4 +156,5 @@ module.exports = {
   addSocialUser,
   addUserInfo,
   checkUserInfo,
+  userWithdrawal,
 };

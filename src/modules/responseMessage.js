@@ -9,7 +9,7 @@ module.exports = {
   PASSWORD_LENGTH_SHORT: '비밀번호가 8자리 이하입니다.',
   PASSWORD_IS_NOT_CORRECT: '비밀번호가 일치하지 않습니다.',
   ALREADY_NICKNAME: '이미 사용중인 닉네임입니다.',
-  UPDATD_USER: '추가 정보 입력 성공',
+  UPDATE_USER: '추가 정보 입력 성공',
   // 로그인
   LOGIN_SUCCESS: '로그인 성공',
   LOGIN_FAIL: '로그인 실패',

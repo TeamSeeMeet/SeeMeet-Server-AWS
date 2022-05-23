@@ -87,7 +87,34 @@ const authSignup = async (req, res) => {
       return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_NICKNAME));
     }
     const user = await userService.addUserInfo(client, userId, name, nickname);
-    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.UPDATD_USER, user));
+    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.UPDATE_USER, user));
+  } catch (error) {
+    console.log(error);
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
+
+//회원탈퇴
+const authWithdrawal = async (req, res) => {
+  const { accesstoken } = req.headers;
+  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  let client;
+  const decodedToken = jwtHandlers.verify(accesstoken);
+  const userId = decodedToken.id;
+  console.log(userId);
+  if (typeof userId == 'undefined') {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN));
+  }
+  try {
+    client = await db.connect(req);
+    const user = await userService.userWithdrawal(client, userId);
+
+    if (!user) {
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
+    }
+    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.DELETE_USER, user));
   } catch (error) {
     console.log(error);
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
@@ -99,4 +126,5 @@ const authSignup = async (req, res) => {
 module.exports = {
   authSocialLogin,
   authSignup,
+  authWithdrawal,
 };

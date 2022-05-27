@@ -30,7 +30,7 @@ const responseInvitation = async (client, userId, invitationId, invitationDateId
     responseRows.push(rows[0]);
   }
 
-  return converSnakeToCamel.keysToCamel(responseRows);
+  return convertSnakeToCamel.keysToCamel(responseRows);
 };
 
 const rejectInvitation = async (client, userId, invitationId) => {
@@ -43,7 +43,7 @@ const rejectInvitation = async (client, userId, invitationId) => {
     [invitationId, userId, true],
   );
 
-  return converSnakeToCamel.keysToCamel(rows[0]);
+  return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
 module.exports = { responseInvitation, rejectInvitation };

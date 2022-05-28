@@ -1,6 +1,7 @@
 const convertSnakeToCamel = require('../modules/convertSnakeToCamel');
 const _ = require('lodash');
 const axios = require('axios');
+const bcrypt = require('bcrypt');
 
 const deleteUser = async (client, userId) => {
   const { rows } = await client.query(
@@ -14,31 +15,49 @@ const deleteUser = async (client, userId) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
-const returnUser = async (client, email) => {
+const returnUser = async (client, email, password) => {
   const { rows } = await client.query(
-    `UPDATE "user" as u
-      SET is_deleted =false, updated_at = now()
-      WHERE email = $1 AND is_deleted = true
-      RETURNING *
+    `SELECT * FROM "user"
+    WHERE email = $1
+    AND is_deleted = false
     `,
     [email],
+  );
+
+  const user = rows[0]
+  if (user) {
+    if (await bcrypt.compare(password, user.password)) {
+      return user
+    } else return null
+  } else return null
+};
+
+const addUser = async (client, email, password) => {
+  const salt = await bcrypt.genSalt(10)
+  const newPassword = await bcrypt.hash(password, salt)
+  const { rows } = await client.query(
+    `
+        INSERT INTO "user"
+        (email, password, provider)
+        VALUES
+        ($1, $2, 'local')
+        RETURNING *
+        `,
+    [email, newPassword],
   );
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
-const addUser = async (client, email, id_Firebase) => {
+const getUserByEmail = async (client, email) => {
   const { rows } = await client.query(
     `
-        INSERT INTO "user"
-        (email, id_Firebase)
-        VALUES
-        ($1, $2)
-        RETURNING *
-        `,
-    [email, id_Firebase],
-  );
-  return convertSnakeToCamel.keysToCamel(rows[0]);
-};
+    SELECT * FROM "user"
+    WHERE email = $1
+    `, [email]
+  )
+
+  return convertSnakeToCamel.keysToCamel(rows[0])
+}
 
 const getUserByIdFirebase = async (client, idFirebase) => {
   const { rows } = await client.query(
@@ -143,4 +162,5 @@ module.exports = {
   addSocialUser,
   addUserInfo,
   checkUserInfo,
+  getUserByEmail,
 };

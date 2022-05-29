@@ -3,7 +3,7 @@ const statusCode = require('../modules/statusCode');
 const responseMessage = require('../modules/responseMessage');
 const db = require('../db/db');
 const jwtHandlers = require('../modules/jwtHandlers');
-const userService = require('../services/userService');
+const userService = require('../services/UserService');
 const { send } = require('../modules/slack');
 const jwt = require('jsonwebtoken');
 

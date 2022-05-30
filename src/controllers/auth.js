@@ -96,7 +96,54 @@ const authSignup = async (req, res) => {
   }
 };
 
+const signUp = async (req, res) => {
+  const { email, password, passwordConfirm } = req.body;
+  if (!email || !password || !passwordConfirm) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.BAD_REQUEST));
+  if (password != passwordConfirm) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.PASSWORD_IS_NOT_CORRECT));
+  let client;
+
+  try {
+    client = await db.connect(req);
+    const newUser = await userService.addUser(client, email, password)
+    const accesstoken = jwtHandlers.sign(newUser)
+    const data = {
+      newUser,
+      accesstoken
+    }
+    return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, data))
+  } catch (error) {
+    console.log(error);
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+}
+
+const authLogin = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE))
+  let client;
+  try {
+    client = await db.connect(req);
+    const user = await userService.returnUser(client, email, password);
+    if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
+    const accesstoken = jwtHandlers.sign(user)
+    const data = {
+      user,
+      accesstoken
+    }
+    return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, data));
+  } catch (error) {
+    console.log(error);
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   authSocialLogin,
   authSignup,
+  signUp,
+  authLogin,
 };

@@ -15,7 +15,6 @@ const sign = user => {
     id: user.id,
     email: user.email,
     name: user.name || null,
-    idFirebase: user.idFirebase,
   };
 
   const result = {

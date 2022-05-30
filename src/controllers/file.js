@@ -14,7 +14,7 @@ const uploadFileToS3 = async (req, res) => {
   const { accesstoken } = req.headers;
   const image = req.file;
   const { originalname, location } = image;
-  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
   const decodedToken = jwtHandlers.verify(accesstoken);
   const userId = decodedToken.id;
 

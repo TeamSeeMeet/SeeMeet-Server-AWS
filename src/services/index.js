@@ -4,4 +4,5 @@ module.exports = {
   invitationService: require('./InvitationService'),
   invitationResponseService: require('./InvitationResponseService'),
   planService: require('./PlanService'),
+  fileService: require('./FileService'),
 };

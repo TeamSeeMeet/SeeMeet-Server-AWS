@@ -7,7 +7,7 @@ const invitationService = require('../services/InvitationService');
 const { send } = require('../modules/slack');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
-const userService = require('../services/userService')
+const userService = require('../services/UserService');
 
 const getCanceledInvitation = async (req, res) => {
   const { invitationId } = req.params;

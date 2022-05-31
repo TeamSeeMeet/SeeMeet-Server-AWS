@@ -57,7 +57,6 @@ const authSocialLogin = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    await send(error);
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   } finally {
     client.release();
@@ -104,34 +103,34 @@ const signUp = async (req, res) => {
 
   try {
     client = await db.connect(req);
-    const newUser = await userService.addUser(client, email, password)
-    const accesstoken = jwtHandlers.sign(newUser)
+    const newUser = await userService.addUser(client, email, password);
+    const accesstoken = jwtHandlers.sign(newUser);
     const data = {
       newUser,
-      accesstoken
-    }
-    return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, data))
+      accesstoken,
+    };
+    return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, data));
   } catch (error) {
     console.log(error);
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   } finally {
     client.release();
   }
-}
+};
 
 const authLogin = async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE))
+  if (!email || !password) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   let client;
   try {
     client = await db.connect(req);
     const user = await userService.returnUser(client, email, password);
     if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
-    const accesstoken = jwtHandlers.sign(user)
+    const accesstoken = jwtHandlers.sign(user);
     const data = {
       user,
-      accesstoken
-    }
+      accesstoken,
+    };
     return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, data));
   } catch (error) {
     console.log(error);
@@ -139,7 +138,7 @@ const authLogin = async (req, res) => {
   } finally {
     client.release();
   }
-}
+};
 
 module.exports = {
   authSocialLogin,

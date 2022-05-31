@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "nodemon"
   },
+  "engines": {
+    "node": "16"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {

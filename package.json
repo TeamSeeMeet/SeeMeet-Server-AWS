@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "dotenv": "^16.0.0",
     "express-validator": "^6.14.0",
     "firebase-admin": "^10.2.0"
   }

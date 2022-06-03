@@ -24,14 +24,13 @@ const authSocialLogin = async (req, res) => {
       if (exuser) {
         const user = exuser;
         const accesstoken = jwtHandlers.socialSign(exuser);
-        res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
+        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
       } else {
         const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id);
         const accesstoken = jwtHandlers.socialSign(user);
-        res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
+        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
       }
     }
-
     if (provider == 'apple') {
       const getAppleUserBySocialtoken = async appleAccessToken => {
         //애플 토큰 해독해서 유저정보 확인
@@ -48,11 +47,11 @@ const authSocialLogin = async (req, res) => {
       if (exuser) {
         const user = exuser;
         const accesstoken = jwtHandlers.socialSign(exuser);
-        res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
+        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
       } else {
         const user = await userService.addSocialUser(client, name, provider, userData.sub);
         const accesstoken = jwtHandlers.socialSign(user);
-        res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
+        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
       }
     }
   } catch (error) {

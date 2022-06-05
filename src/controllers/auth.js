@@ -146,7 +146,6 @@ const authWithdrawal = async (req, res) => {
   let client;
   const decodedToken = jwtHandlers.verify(accesstoken);
   const userId = decodedToken.id;
-  console.log(userId);
   if (typeof userId == 'undefined') {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN));
   }
@@ -171,4 +170,5 @@ module.exports = {
   authSignup,
   signUp,
   authLogin,
+  authWithdrawal,
 };

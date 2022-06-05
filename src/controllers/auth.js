@@ -139,6 +139,33 @@ const authLogin = async (req, res) => {
   }
 };
 
+//회원탈퇴
+const authWithdrawal = async (req, res) => {
+  const { accesstoken } = req.headers;
+  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  let client;
+  const decodedToken = jwtHandlers.verify(accesstoken);
+  const userId = decodedToken.id;
+  console.log(userId);
+  if (typeof userId == 'undefined') {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN));
+  }
+  try {
+    client = await db.connect(req);
+    const user = await userService.userWithdrawal(client, userId);
+
+    if (!user) {
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
+    }
+    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.DELETE_USER, user));
+  } catch (error) {
+    console.log(error);
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   authSocialLogin,
   authSignup,

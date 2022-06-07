@@ -138,17 +138,18 @@ const addUserInfo = async (client, userId, name, nickname) => {
 const checkUserInfo = async (client, nickname) => {
   const { rows } = await client.query(
     `
-    SELECT nickname
+    SELECT nickname, id
     FROM "user"
     WHERE nickname = $1
     `,
     [nickname],
   );
-  if (typeof rows[0] == 'undefined') {
-    return 0;
-  }
-  console.log(rows[0]);
-  return 1;
+  return convertSnakeToCamel.keysToCamel(rows[0]);
+  // if (typeof rows[0] == 'undefined') {
+  //   return 0;
+  // }
+  // console.log(rows[0]);
+  // return 1;
 };
 
 const userWithdrawal = async (client, userId) => {

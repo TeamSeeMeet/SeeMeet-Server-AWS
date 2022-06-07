@@ -83,7 +83,9 @@ const authSignup = async (req, res) => {
     //닉네임 중복 검사
     const checkUser = await userService.checkUserInfo(client, nickname);
     if (checkUser) {
-      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_NICKNAME));
+      if (checkUser.id !== userId) {
+        return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_NICKNAME));
+      }
     }
     const user = await userService.addUserInfo(client, userId, name, nickname);
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.UPDATD_USER, user));

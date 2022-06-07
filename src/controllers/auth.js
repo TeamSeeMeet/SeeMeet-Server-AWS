@@ -9,19 +9,17 @@ const jwt = require('jsonwebtoken');
 
 const authSocialLogin = async (req, res) => {
   const { socialtoken, provider, name } = req.body;
-  // if (!provider || !name) {
-  //   await send(`provider : ${provider}\nname : ${name}`);
-  //   return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
-  // }
   let client;
-
   try {
     client = await db.connect(req);
-
     if (provider == 'kakao') {
       const userData = await userService.getKakaoUserBySocialtoken(client, socialtoken);
       const exuser = await userService.getUserBySocialId(client, userData.id);
+      console.log(exuser.isDeleted);
       if (exuser) {
+        if (exuser.isDeleted === true) {
+          return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.DELETED_USER));
+        }
         const user = exuser;
         const accesstoken = jwtHandlers.socialSign(exuser);
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
@@ -45,6 +43,9 @@ const authSocialLogin = async (req, res) => {
       const userData = await getAppleUserBySocialtoken(socialtoken);
       const exuser = await userService.getUserBySocialId(client, userData.sub);
       if (exuser) {
+        if (exuser.isDeleted === true) {
+          return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.DELETED_USER));
+        }
         const user = exuser;
         const accesstoken = jwtHandlers.socialSign(exuser);
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));

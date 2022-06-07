@@ -5,6 +5,7 @@ module.exports = {
   // 회원가입
   CREATED_USER: '회원 가입 성공',
   DELETE_USER: '회원 탈퇴 성공',
+  DELETED_USER: '탈퇴한 유저입니다',
   ALREADY_EMAIL: '이미 사용중인 이메일입니다.',
   PASSWORD_LENGTH_SHORT: '비밀번호가 8자리 이하입니다.',
   PASSWORD_IS_NOT_CORRECT: '비밀번호가 일치하지 않습니다.',

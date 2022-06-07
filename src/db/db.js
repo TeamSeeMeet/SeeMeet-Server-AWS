@@ -33,7 +33,7 @@ const connect = async req => {
     return query.apply(client, args);
   };
   client.release = () => {
-    clearTimeout(releaseChecker);
+    // clearTimeout(releaseChecker);
     const time = dayjs().diff(now, 'millisecond');
     if (time > 4000) {
       const message = `[RELEASE] in ${time} | ${string}`;

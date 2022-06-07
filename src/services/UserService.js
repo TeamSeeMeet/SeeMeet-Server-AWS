@@ -101,7 +101,6 @@ const getUserBySocialId = async (client, socialId) => {
     `
     SELECT * FROM "user"
     WHERE social_id = $1
-    AND is_deleted = FALSE
     `,
     [socialId],
   );

@@ -8,7 +8,7 @@ const { send } = require('../modules/slack');
 const jwt = require('jsonwebtoken');
 
 const authSocialLogin = async (req, res) => {
-  const { device, socialtoken, provider, name } = req.body;
+  const { fcm, socialtoken, provider, name } = req.body;
   let client;
   try {
     client = await db.connect(req);
@@ -21,12 +21,12 @@ const authSocialLogin = async (req, res) => {
         }
         var user = exuser;
         const accesstoken = jwtHandlers.socialSign(exuser);
-        if (user.device != device) {
-          user = await userService.updateUserDevice(client, user.id, device);
+        if (user.fcm != fcm) {
+          user = await userService.updateUserDevice(client, user.id, fcm);
         }
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
       } else {
-        const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id, device);
+        const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id, fcm);
         const accesstoken = jwtHandlers.socialSign(user);
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
       }
@@ -50,13 +50,12 @@ const authSocialLogin = async (req, res) => {
         }
         var user = exuser;
         const accesstoken = jwtHandlers.socialSign(exuser);
-        //여기서 디바이스 토큰 변경해줘야할듯
-        if (user.device != device) {
-          user = await userService.updateUserDevice(client, user.id, device);
+        if (user.fcm != fcm) {
+          user = await userService.updateUserDevice(client, user.id, fcm);
         }
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
       } else {
-        const user = await userService.addSocialUser(client, name, provider, userData.sub, device);
+        const user = await userService.addSocialUser(client, name, provider, userData.sub, fcm);
         const accesstoken = jwtHandlers.socialSign(user);
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
       }

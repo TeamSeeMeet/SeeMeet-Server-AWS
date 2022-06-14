@@ -8,23 +8,25 @@ const { send } = require('../modules/slack');
 const jwt = require('jsonwebtoken');
 
 const authSocialLogin = async (req, res) => {
-  const { socialtoken, provider, name } = req.body;
+  const { device, socialtoken, provider, name } = req.body;
   let client;
   try {
     client = await db.connect(req);
     if (provider == 'kakao') {
       const userData = await userService.getKakaoUserBySocialtoken(client, socialtoken);
       const exuser = await userService.getUserBySocialId(client, userData.id);
-      console.log(exuser.isDeleted);
       if (exuser) {
         if (exuser.isDeleted === true) {
           return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.DELETED_USER));
         }
-        const user = exuser;
+        var user = exuser;
         const accesstoken = jwtHandlers.socialSign(exuser);
+        if (user.device != device) {
+          user = await userService.updateUserDevice(client, user.id, device);
+        }
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
       } else {
-        const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id);
+        const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id, device);
         const accesstoken = jwtHandlers.socialSign(user);
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
       }
@@ -46,11 +48,15 @@ const authSocialLogin = async (req, res) => {
         if (exuser.isDeleted === true) {
           return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.DELETED_USER));
         }
-        const user = exuser;
+        var user = exuser;
         const accesstoken = jwtHandlers.socialSign(exuser);
+        //여기서 디바이스 토큰 변경해줘야할듯
+        if (user.device != device) {
+          user = await userService.updateUserDevice(client, user.id, device);
+        }
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
       } else {
-        const user = await userService.addSocialUser(client, name, provider, userData.sub);
+        const user = await userService.addSocialUser(client, name, provider, userData.sub, device);
         const accesstoken = jwtHandlers.socialSign(user);
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
       }

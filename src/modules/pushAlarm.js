@@ -3,7 +3,7 @@ const util = require('./util');
 const statusCode = require('../modules/statusCode');
 const responseMessage = require('../modules/responseMessage');
 
-const sendPushAlarm = async (title, body, receiverToken) => {
+const sendPushAlarm = async (title, body, receiverToken, planId) => {
   //   let mutableContent = 1;
 
   // FCM Token이 empty인 경우 제외
@@ -23,6 +23,7 @@ const sendPushAlarm = async (title, body, receiverToken) => {
         data: {
           title,
           body,
+          planId,
         },
       },
       apns: {
@@ -32,9 +33,11 @@ const sendPushAlarm = async (title, body, receiverToken) => {
               title,
               body,
             },
+            planId,
           },
         },
       },
+
       tokens: receiverToken,
     };
 

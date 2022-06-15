@@ -14,11 +14,6 @@ const sendPushAlarm = async (title, body, receiverToken, planId) => {
 
   try {
     const message = {
-      //   data: {
-      //     title: title,
-      //     body: body,
-      //   },
-      //   tokens: receiverToken,
       android: {
         data: {
           title,

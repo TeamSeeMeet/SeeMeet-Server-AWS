@@ -1,5 +1,3 @@
-// const functions = require('firebase-functions');
-//test
 const { Pool, Query } = require('pg'); //postgres
 const dayjs = require('dayjs');
 const dotenv = require('dotenv');

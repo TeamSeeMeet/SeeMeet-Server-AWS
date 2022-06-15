@@ -108,16 +108,16 @@ const getUserBySocialId = async (client, socialId) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
-const addSocialUser = async (client, name, provider, socialId) => {
+const addSocialUser = async (client, name, provider, socialId, fcm) => {
   const { rows } = await client.query(
     `
     INSERT INTO "user"
-    (username, provider, social_id)
+    (username, provider, social_id, fcm)
     VALUES
-    ($1, $2, $3)
+    ($1, $2, $3, $4)
     RETURNING *
     `,
-    [name, provider, socialId],
+    [name, provider, socialId, fcm],
   );
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
@@ -165,6 +165,19 @@ const userWithdrawal = async (client, userId) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
+const updateUserDevice = async (client, userId, fcm) => {
+  const { rows } = await client.query(
+    `
+    UPDATE "user"
+    SET fcm = $2
+    WHERE id = $1
+    RETURNING *
+    `,
+    [userId, fcm],
+  );
+  return convertSnakeToCamel.keysToCamel(rows[0]);
+};
+
 module.exports = {
   deleteUser,
   addUser,
@@ -178,4 +191,5 @@ module.exports = {
   checkUserInfo,
   getUserByEmail,
   userWithdrawal,
+  updateUserDevice,
 };

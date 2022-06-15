@@ -50,7 +50,7 @@ const pushPlan = async (req, res) => {
     const plan = await pushService.pushPlan(client, today);
     let result = plan.map(a => a.fcm);
     console.log(result);
-    pushAlarm.sendPushAlarm(req, res, 'test', 'push', result);
+    pushAlarm.sendPushAlarm('test', 'push', result);
     // return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.READ_ONE_POST_SUCCESS, plan));
   } catch (error) {
     console.log(error);

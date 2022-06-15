@@ -3,7 +3,7 @@ const util = require('./util');
 const statusCode = require('../modules/statusCode');
 const responseMessage = require('../modules/responseMessage');
 
-const sendPushAlarm = async (req, res, title, body, receiverToken) => {
+const sendPushAlarm = async (title, body, receiverToken) => {
   //   let mutableContent = 1;
 
   // FCM Token이 empty인 경우 제외
@@ -43,11 +43,11 @@ const sendPushAlarm = async (req, res, title, body, receiverToken) => {
       .sendMulticast(message)
       .then(function (response) {
         console.log('Successfully sent message: : ', response);
-        return res.status(200).json({ success: true });
+        // return res.status(200).json({ success: true });
       })
       .catch(function (err) {
         console.log('Error Sending message!!! : ', err);
-        return res.status(400).json({ success: false });
+        // return res.status(400).json({ success: false });
       });
   } catch (error) {
     return res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));

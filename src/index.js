@@ -23,5 +23,5 @@ app.listen(port, () => {
 const rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = [0, new schedule.Range(0, 6)];
 rule.hour = 16;
-rule.minute = 31;
-const job = schedule.scheduleJob(rule, pushPlan(req, res));
+rule.minute = 44;
+const job = schedule.scheduleJob(rule, pushPlan);

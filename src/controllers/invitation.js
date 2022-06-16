@@ -7,7 +7,7 @@ const invitationService = require('../services/InvitationService');
 const { send } = require('../modules/slack');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
-const userService = require('../services/userService')
+const userService = require('../services/UserService')
 
 const getCanceledInvitation = async (req, res) => {
   const { invitationId } = req.params;
@@ -205,7 +205,6 @@ const getInvitation = async (req, res) => {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
     const userId = decodedToken.id;
-
     if (!userId) {
       await send(`
         req.originalURL: ${req.originalUrl},

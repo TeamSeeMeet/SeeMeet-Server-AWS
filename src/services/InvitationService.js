@@ -206,7 +206,20 @@ const getAllInvitation = async (client, userId) => {
       row.planId = planRows[0].id;
     }
   }
-
+  newRows.map((value) => {
+    const date1 = new Date(value.created_at)
+    const date2 = new Date()
+    const diffTime = Math.abs(date2 - date1);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    value.days = diffDays
+  })
+  newConfirmedRows.map((value) => {
+    const date1 = new Date(value.created_at)
+    const date2 = new Date()
+    const diffTime = Math.abs(date2 - date1);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    value.days = diffDays
+  })
   const data = { invitations: newRows, confirmedAndCanceld: newConfirmedRows };
 
   return convertSnakeToCamel.keysToCamel(data);

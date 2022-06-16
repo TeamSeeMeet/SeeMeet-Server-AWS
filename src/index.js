@@ -3,7 +3,8 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
 const routes = require('./routes');
-
+const schedule = require('node-schedule');
+const { pushPlan } = require('./controllers/push');
 const admin = require('firebase-admin');
 let serviceAccount = require('./seemeet-700c2-firebase-adminsdk-wxykw-33b03af3c8.json');
 
@@ -18,3 +19,10 @@ app.use(routes); //라우터
 app.listen(port, () => {
   console.log(`App running on port ${port}.`);
 });
+
+//push
+const rule = new schedule.RecurrenceRule();
+rule.dayOfWeek = [0, new schedule.Range(0, 6)];
+rule.hour = 22;
+rule.minute = 0;
+const job = schedule.scheduleJob(rule, pushPlan);

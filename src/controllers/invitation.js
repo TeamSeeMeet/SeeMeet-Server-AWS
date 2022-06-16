@@ -205,7 +205,6 @@ const getInvitation = async (req, res) => {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
     const userId = decodedToken.id;
-
     if (!userId) {
       await send(`
         req.originalURL: ${req.originalUrl},

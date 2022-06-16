@@ -131,6 +131,10 @@ const authLogin = async (req, res) => {
   let client;
   try {
     client = await db.connect(req);
+    const isEmail = await userService.getUserByEmail(client, email);
+    if (!isEmail) {
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.INVALID_EMAIL))
+    }
     const user = await userService.returnUser(client, email, password);
     if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
     const accesstoken = jwtHandlers.sign(user);

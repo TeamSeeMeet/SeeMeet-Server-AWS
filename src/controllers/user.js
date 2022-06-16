@@ -5,6 +5,8 @@ const db = require('../db/db');
 const jwtHandlers = require('../modules/jwtHandlers');
 const userService = require('../services/UserService');
 const friendService = require('../services/FriendService');
+const { response } = require('express');
+const { password } = require('../config');
 
 const deleteUser = async (req, res) => {
   const { accesstoken } = req.headers;
@@ -29,6 +31,32 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  const { accesstoken } = req.headers;
+  const { password, passwordConfirm } = req.body;
+  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  let client;
+  try {
+    client = await db.connect(req);
+    const decodedToken = jwtHandlers.verify(accesstoken);
+    const userId = decodedToken.id;
+    if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
+
+    if (password != passwordConfirm) {
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, "패스워드가 일치하지 않습니다."))
+    }
+
+    const data = await userService.resetPassword(client, userId, password);
+    res.status(statusCode.OK).send(util.success(statusCode.OK, "비밀번호 변경 성공", data));
+  } catch (error) {
+    console.log(error);
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+}
 module.exports = {
   deleteUser,
+  resetPassword
 };

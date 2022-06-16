@@ -42,14 +42,15 @@ const pushPlan = async (req, res) => {
     // 월 getMonth() (0~11로 1월이 0으로 표현되기 때문에 + 1을 해주어야 원하는 월을 구할 수 있다.)
     let month = now.getMonth() + 1;
     // 일 getDate()
-    let date = now.getDate(); // 일
+    let date = now.getDate() + 1; // 일
     const today = year + '-' + month + '-' + date;
 
     const plan = await pushService.pushPlan(client, today);
-    let token = plan.map(a => a.fcm);
-    let planId = plan.map(a => a.id);
     console.log(plan);
-    pushAlarm.sendPushAlarm(pm.push9title, pm.push9Desc, token, String(planId));
+    console.log(today);
+    let token = plan.map(a => a.fcm);
+    token = [...new Set(token)];
+    pushAlarm.sendPushAlarm(pm.push9title, pm.push9Desc, token);
   } catch (error) {
     console.log(error);
   } finally {

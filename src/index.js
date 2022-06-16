@@ -23,6 +23,6 @@ app.listen(port, () => {
 //push
 const rule = new schedule.RecurrenceRule();
 rule.dayOfWeek = [0, new schedule.Range(0, 6)];
-rule.hour = 9;
+rule.hour = 22;
 rule.minute = 0;
 const job = schedule.scheduleJob(rule, pushPlan);

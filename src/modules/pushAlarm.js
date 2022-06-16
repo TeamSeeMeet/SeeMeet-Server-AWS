@@ -1,17 +1,15 @@
 const admin = require('firebase-admin');
 
-const sendPushAlarm = async (title, body, receiverToken, planId) => {
+const sendPushAlarm = async (title, body, receiverToken) => {
   if (!receiverToken.length) {
     return 0;
   }
-
   try {
     const message = {
       android: {
         data: {
           title,
           body,
-          planId,
         },
       },
       apns: {
@@ -21,7 +19,6 @@ const sendPushAlarm = async (title, body, receiverToken, planId) => {
               title,
               body,
             },
-            planId,
           },
         },
       },

@@ -95,7 +95,6 @@ const getAllInvitation = async (client, userId) => {
       `,
       [userId, row.id],
     );
-    console.log('-----------------' + responseRows);
     if (responseRows.length > 0) {
       row.isResponse = true;
     } else {
@@ -107,8 +106,7 @@ const getAllInvitation = async (client, userId) => {
 
   const { rows: confirmedRows } = await client.query(
     `
-
-          SELECT id, invitation_title, is_canceled, is_confirmed FROM "invitation"
+          SELECT id, invitation_title, is_canceled, is_confirmed, created_at FROM "invitation"
           WHERE host_id = $1
           AND (invitation.is_confirmed = true
           OR invitation.is_canceled = true)
@@ -128,7 +126,6 @@ const getAllInvitation = async (client, userId) => {
     `,
     [userId],
   );
-
   const newConfirmedRows = _.union(confirmedRows, receivedConfirmedRows);
 
   for (let row of newConfirmedRows) {

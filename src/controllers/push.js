@@ -1,7 +1,5 @@
 const admin = require('firebase-admin');
-const util = require('../modules/util');
-const statusCode = require('../modules/statusCode');
-const responseMessage = require('../modules/responseMessage');
+const pm = require('../modules/pushMessage');
 const db = require('../db/db');
 const jwtHandlers = require('../modules/jwtHandlers');
 const pushAlarm = require('../modules/pushAlarm');
@@ -48,13 +46,12 @@ const pushPlan = async (req, res) => {
     const today = year + '-' + month + '-' + date;
 
     const plan = await pushService.pushPlan(client, today);
-    let result = plan.map(a => a.fcm);
-    console.log(result);
-    pushAlarm.sendPushAlarm('test', 'push', result, '3838');
-    // return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.READ_ONE_POST_SUCCESS, plan));
+    let token = plan.map(a => a.fcm);
+    let planId = plan.map(a => a.id);
+    console.log(plan);
+    pushAlarm.sendPushAlarm(pm.push9title, pm.push9Desc, token, String(planId));
   } catch (error) {
     console.log(error);
-    // res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   } finally {
     client.release();
   }

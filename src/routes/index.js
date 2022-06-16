@@ -7,5 +7,5 @@ router.use('/friend', require('./friend'));
 router.use('/plan', require('./plan'));
 router.use('/invitation', require('./invitation'));
 router.use('/invitation-response', require('./invitationResponse'));
-
+router.use('/push', require('./push'));
 module.exports = router;

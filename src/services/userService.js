@@ -24,20 +24,19 @@ const returnUser = async (client, email, password) => {
     [email],
   );
 
-  const user = rows[0]
-  console.log(user)
+  const user = rows[0];
   if (user) {
     console.log("uset")
     console.log(await bcrypt.compare(user.password, password))
     if (await bcrypt.compare(password, user.password)) {
-      return user
-    } else return null
-  } else return null
+      return user;
+    } else return null;
+  } else return null;
 };
 
 const addUser = async (client, email, password) => {
-  const salt = await bcrypt.genSalt(10)
-  const newPassword = await bcrypt.hash(password, salt)
+  const salt = await bcrypt.genSalt(10);
+  const newPassword = await bcrypt.hash(password, salt);
   const { rows } = await client.query(
     `
         INSERT INTO "user"
@@ -56,11 +55,12 @@ const getUserByEmail = async (client, email) => {
     `
     SELECT * FROM "user"
     WHERE email = $1
-    `, [email]
-  )
+    `,
+    [email],
+  );
 
-  return convertSnakeToCamel.keysToCamel(rows[0])
-}
+  return convertSnakeToCamel.keysToCamel(rows[0]);
+};
 
 const getUserByIdFirebase = async (client, idFirebase) => {
   const { rows } = await client.query(
@@ -103,7 +103,6 @@ const getUserBySocialId = async (client, socialId) => {
     `
     SELECT * FROM "user"
     WHERE social_id = $1
-    AND is_deleted = FALSE
     `,
     [socialId],
   );
@@ -111,16 +110,16 @@ const getUserBySocialId = async (client, socialId) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
-const addSocialUser = async (client, name, provider, socialId) => {
+const addSocialUser = async (client, name, provider, socialId, fcm) => {
   const { rows } = await client.query(
     `
     INSERT INTO "user"
-    (username, provider, social_id)
+    (username, provider, social_id, fcm)
     VALUES
-    ($1, $2, $3)
+    ($1, $2, $3, $4)
     RETURNING *
     `,
-    [name, provider, socialId],
+    [name, provider, socialId, fcm],
   );
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
@@ -141,17 +140,44 @@ const addUserInfo = async (client, userId, name, nickname) => {
 const checkUserInfo = async (client, nickname) => {
   const { rows } = await client.query(
     `
-    SELECT nickname
+    SELECT nickname, id
     FROM "user"
     WHERE nickname = $1
     `,
     [nickname],
   );
-  if (typeof rows[0] == 'undefined') {
-    return 0;
-  }
-  console.log(rows[0]);
-  return 1;
+  return convertSnakeToCamel.keysToCamel(rows[0]);
+  // if (typeof rows[0] == 'undefined') {
+  //   return 0;
+  // }
+  // console.log(rows[0]);
+  // return 1;
+};
+
+const userWithdrawal = async (client, userId) => {
+  const { rows } = await client.query(
+    `
+    UPDATE "user"
+    SET is_deleted = true
+    WHERE id = $1
+    RETURNING *
+    `,
+    [userId],
+  );
+  return convertSnakeToCamel.keysToCamel(rows[0]);
+};
+
+const updateUserDevice = async (client, userId, fcm) => {
+  const { rows } = await client.query(
+    `
+    UPDATE "user"
+    SET fcm = $2
+    WHERE id = $1
+    RETURNING *
+    `,
+    [userId, fcm],
+  );
+  return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
 const resetPassword = async (client, id, password) => {
@@ -181,5 +207,7 @@ module.exports = {
   addUserInfo,
   checkUserInfo,
   getUserByEmail,
+  userWithdrawal,
+  updateUserDevice,
   resetPassword
 };

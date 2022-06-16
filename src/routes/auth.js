@@ -6,5 +6,5 @@ router.post('/social', auth.authSocialLogin);
 router.put('/', auth.authSignup);
 router.post('/', auth.signUp);
 router.post('/login', auth.authLogin);
-
+router.put('/withdrawal', auth.authWithdrawal);
 module.exports = router;

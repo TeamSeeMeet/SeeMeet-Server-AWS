@@ -26,8 +26,8 @@ const returnUser = async (client, email, password) => {
 
   const user = rows[0];
   if (user) {
-    console.log("uset")
-    console.log(await bcrypt.compare(user.password, password))
+    console.log('uset');
+    console.log(await bcrypt.compare(user.password, password));
     if (await bcrypt.compare(password, user.password)) {
       return user;
     } else return null;
@@ -77,7 +77,7 @@ const getUserByIdFirebase = async (client, idFirebase) => {
 const getUserinfoByuserIds = async (client, userIds) => {
   const { rows } = await client.query(
     `
-        SELECT u.id,u.username,u.email, u.nickname
+        SELECT *
         FROM "user" u
         WHERE id IN(${userIds.join()})
         AND is_deleted = FALSE
@@ -181,8 +181,8 @@ const updateUserDevice = async (client, userId, fcm) => {
 };
 
 const resetPassword = async (client, id, password) => {
-  const salt = await bcrypt.genSalt(10)
-  const newPassword = await bcrypt.hash(password, salt)
+  const salt = await bcrypt.genSalt(10);
+  const newPassword = await bcrypt.hash(password, salt);
 
   const { rows } = await client.query(
     `
@@ -190,10 +190,11 @@ const resetPassword = async (client, id, password) => {
     SET password = $1
     WHERE "user".id = $2
     RETURNING *
-    `, [newPassword, id]
-  )
-  return rows
-}
+    `,
+    [newPassword, id],
+  );
+  return rows;
+};
 
 module.exports = {
   deleteUser,
@@ -209,5 +210,5 @@ module.exports = {
   getUserByEmail,
   userWithdrawal,
   updateUserDevice,
-  resetPassword
+  resetPassword,
 };

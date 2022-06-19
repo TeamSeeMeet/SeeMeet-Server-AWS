@@ -110,6 +110,10 @@ const signUp = async (req, res) => {
 
   try {
     client = await db.connect(req);
+    const exUser = await userService.getUserByEmail(client, email);
+    if (exUser) {
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_EMAIL));
+    }
     const newUser = await userService.addUser(client, email, password);
     const accesstoken = jwtHandlers.sign(newUser);
     const data = {

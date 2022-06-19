@@ -26,8 +26,7 @@ const returnUser = async (client, email, password) => {
 
   const user = rows[0];
   if (user) {
-    console.log('uset');
-    console.log(await bcrypt.compare(user.password, password));
+    console.log(user)
     if (await bcrypt.compare(password, user.password)) {
       return user;
     } else return null;

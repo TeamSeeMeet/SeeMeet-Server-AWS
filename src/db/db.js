@@ -23,6 +23,8 @@ const connect = async req => {
   await send(string);
   const callStack = new Error().stack;
   const client = await pool.connect();
+  const query = client.query;
+  const release = client.release;
   //const releaseChecker = setTimeout(() => {
   //  devMode
   //     ? console.error('[ERROR] client connection이 15초 동안 릴리즈되지 않았습니다.', { callStack })

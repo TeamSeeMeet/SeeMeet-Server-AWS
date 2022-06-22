@@ -26,3 +26,5 @@ rule.dayOfWeek = [0, new schedule.Range(0, 6)];
 rule.hour = 22;
 rule.minute = 0;
 const job = schedule.scheduleJob(rule, pushPlan);
+
+console.log('11');

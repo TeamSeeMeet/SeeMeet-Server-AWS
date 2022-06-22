@@ -110,6 +110,10 @@ const signUp = async (req, res) => {
 
   try {
     client = await db.connect(req);
+    const exUser = await userService.getUserByEmail(client, email);
+    if (exUser) {
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_EMAIL));
+    }
     const newUser = await userService.addUser(client, email, password);
     const accesstoken = jwtHandlers.sign(newUser);
     const data = {
@@ -135,7 +139,7 @@ const authLogin = async (req, res) => {
     if (!isEmail) {
       return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.INVALID_EMAIL));
     }
-    const user = await userService.returnUser(client, email, password);
+    let user = await userService.returnUser(client, email, password);
     if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
     const accesstoken = jwtHandlers.sign(user);
     if (user.fcm != fcm) {

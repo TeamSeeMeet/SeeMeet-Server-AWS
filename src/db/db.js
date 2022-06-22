@@ -29,25 +29,25 @@ const connect = async req => {
   //const releaseChecker = setTimeout(() => {
   //  devMode
   //     ? console.error('[ERROR] client connection이 15초 동안 릴리즈되지 않았습니다.', { callStack })
-   //    : functions.logger.error('[ERROR] client connection이 15초 동안 릴리즈되지 않았습니다.', { callStack });
-   //  devMode ? console.error(`마지막으로 실행된 쿼리문입니다. ${client.lastQuery}`) : functions.logger.error(`마지막으로 실행된 쿼리문입니다. ${client.lastQuery}`);
+  //    : functions.logger.error('[ERROR] client connection이 15초 동안 릴리즈되지 않았습니다.', { callStack });
+  //  devMode ? console.error(`마지막으로 실행된 쿼리문입니다. ${client.lastQuery}`) : functions.logger.error(`마지막으로 실행된 쿼리문입니다. ${client.lastQuery}`);
   // }, 15 * 1000);
 
-   client.query = (...args) => {
-     client.lastQuery = args;
-     return query.apply(client, args);
-   };
-   client.release = () => {
-  //   clearTimeout(releaseChecker);
-     const time = dayjs().diff(now, 'millisecond');
-     if (time > 4000) {
-       const message = `[RELEASE] in ${time} | ${string}`;
-       devMode && console.log(message);
-     }
-     client.query = query;
-     client.release = release;
-     return release.apply(client);
-   };
+  client.query = (...args) => {
+    client.lastQuery = args;
+    return query.apply(client, args);
+  };
+  client.release = () => {
+    //   clearTimeout(releaseChecker);
+    const time = dayjs().diff(now, 'millisecond');
+    if (time > 4000) {
+      const message = `[RELEASE] in ${time} | ${string}`;
+      //  devMode && console.log(message);
+    }
+    client.query = query;
+    client.release = release;
+    return release.apply(client);
+  };
   return client;
 };
 

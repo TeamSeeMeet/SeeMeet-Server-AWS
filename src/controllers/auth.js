@@ -142,12 +142,9 @@ const authLogin = async (req, res) => {
     let user = await userService.returnUser(client, email, password);
     if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
     const accesstoken = jwtHandlers.sign(user);
-    console.log(user.fcm);
-    console.log(fcm);
     if (user.fcm != fcm) {
       user = await userService.updateUserDevice(client, user.id, fcm);
     }
-    console.log(user);
     const data = {
       user,
       accesstoken,

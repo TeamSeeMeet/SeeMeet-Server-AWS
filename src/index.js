@@ -27,5 +27,3 @@ rule.hour = 22;
 rule.minute = 0;
 rule.tz = 'Asia/Seoul';
 const job = schedule.scheduleJob(rule, pushPlan);
-
-console.log('11');

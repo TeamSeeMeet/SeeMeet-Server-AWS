@@ -26,6 +26,8 @@ const uploadFileToS3 = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
   }
 };
 

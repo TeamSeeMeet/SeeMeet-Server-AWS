@@ -35,7 +35,6 @@ const pushPlan = async (req, res) => {
   let client;
   try {
     client = await db.connect(req);
-
     let now = new Date();
     // 년도 getFullYear()
     let year = now.getFullYear();
@@ -50,6 +49,9 @@ const pushPlan = async (req, res) => {
     console.log(today);
     let token = plan.map(a => a.fcm);
     token = [...new Set(token)];
+    token = token.filter(function (item) {
+      return item !== null && item !== undefined && item !== '';
+    });
     pushAlarm.sendPushAlarm(pm.push9title, pm.push9Desc, token);
   } catch (error) {
     console.log(error);

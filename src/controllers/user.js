@@ -44,19 +44,44 @@ const resetPassword = async (req, res) => {
     if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
 
     if (password != passwordConfirm) {
-      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, "패스워드가 일치하지 않습니다."))
+      return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, '패스워드가 일치하지 않습니다.'));
     }
 
     const data = await userService.resetPassword(client, userId, password);
-    res.status(statusCode.OK).send(util.success(statusCode.OK, "비밀번호 변경 성공", data));
+    res.status(statusCode.OK).send(util.success(statusCode.OK, '비밀번호 변경 성공', data));
   } catch (error) {
     console.log(error);
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   } finally {
     client.release();
   }
-}
+};
+
+const changePush = async (req, res) => {
+  const { accesstoken } = req.headers;
+  const { push, fcm } = req.body;
+  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  let client;
+  try {
+    client = await db.connect(req);
+    const decodedToken = jwtHandlers.verify(accesstoken);
+    const userId = decodedToken.id;
+    if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
+
+    const user = await userService.changePush(client, userId, push, fcm);
+
+    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.UPDATD_USER, user));
+  } catch (error) {
+    console.log(error);
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   deleteUser,
-  resetPassword
+  resetPassword,
+  changePush,
 };

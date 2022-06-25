@@ -44,12 +44,12 @@ const pushPlan = async (req, res) => {
     // 일 getDate()
     let date = now.getDate() + 1; // 일
     const today = year + '-' + month + '-' + date;
-
     const plan = await pushService.pushPlan(client, today);
-    console.log(plan);
-    console.log(today);
     let token = plan.map(a => a.fcm);
     token = [...new Set(token)];
+    token = token.filter(function (item) {
+      return item !== null && item !== undefined && item !== '';
+    });
     pushAlarm.sendPushAlarm(pm.push9title, pm.push9Desc, token);
   } catch (error) {
     console.log(error);

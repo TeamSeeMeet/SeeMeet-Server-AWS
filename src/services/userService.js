@@ -26,7 +26,7 @@ const returnUser = async (client, email, password) => {
 
   const user = rows[0];
   if (user) {
-    console.log(user)
+    console.log(user);
     if (await bcrypt.compare(password, user.password)) {
       return user;
     } else return null;
@@ -157,7 +157,7 @@ const userWithdrawal = async (client, userId) => {
   const { rows } = await client.query(
     `
     UPDATE "user"
-    SET is_deleted = true
+    SET is_deleted = true, email = null
     WHERE id = $1
     RETURNING *
     `,
@@ -195,6 +195,19 @@ const resetPassword = async (client, id, password) => {
   return rows;
 };
 
+const changePush = async (client, userId, push, fcm) => {
+  const { rows } = await client.query(
+    `
+    UPDATE "user"
+    SET fcm = $2, push = $3
+    WHERE id = $1
+    RETURNING *
+    `,
+    [userId, fcm, push],
+  );
+  return convertSnakeToCamel.keysToCamel(rows[0]);
+};
+
 module.exports = {
   deleteUser,
   addUser,
@@ -210,4 +223,5 @@ module.exports = {
   userWithdrawal,
   updateUserDevice,
   resetPassword,
+  changePush,
 };

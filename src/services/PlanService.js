@@ -228,6 +228,39 @@ const deletePlan = async (client, userId, planId) => {
     `,
     [userId, planId],
   );
+
+  const { rows: host } = await client.query(
+    `
+    SELECT *
+    FROM plan, invitation_date, invitation
+    WHERE plan.id = $1 AND plan.invitation_date_id = invitation_date.id AND invitation_date.invitation_id = invitation.id
+    `,
+    [planId],
+  );
+  const hostId = host[0].host_id;
+  const invitationId = host[0].id;
+  console.log(invitationId);
+  if (hostId === userId) {
+    const { rows } = await client.query(
+      `
+      UPDATE invitation
+      SET is_visible=false
+      WHERE invitation.id= $1
+      RETURNING *
+      `,
+      [invitationId],
+    );
+  } else {
+    const { rows } = await client.query(
+      `
+      UPDATE invitation_user_connection
+      SET is_visible=false
+      WHERE invitation_id= $1 AND guest_id = $2
+      RETURNING *
+      `,
+      [invitationId, userId],
+    );
+  }
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 

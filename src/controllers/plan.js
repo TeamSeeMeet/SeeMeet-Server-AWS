@@ -85,6 +85,7 @@ const deletePlan = async (req, res) => {
 
     const plan = await planService.deletePlan(client, userId, planId);
 
+    console.log(plan);
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.READ_ALL_USERS_SUCCESS, plan));
   } catch (error) {
     console.log(error);

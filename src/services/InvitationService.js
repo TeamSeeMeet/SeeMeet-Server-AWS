@@ -44,6 +44,7 @@ const getAllInvitation = async (client, userId) => {
     let values = [];
     for (let r of guestIdRows) {
       let guestId = r.guest_id;
+      console.log(r)
       const { rows: guest } = await client.query(
         `
           SELECT id, username FROM "user"
@@ -52,21 +53,25 @@ const getAllInvitation = async (client, userId) => {
           `,
         [guestId],
       );
+      if (guest.length > 0) {
 
-      const { rows: responseRows } = await client.query(
-        `
-            SELECT * FROM "invitation_response"
-            WHERE invitation_id = $1
-            AND guest_id = $2
-            `,
-        [id, guestId],
-      );
-      if (responseRows.length > 0) {
-        guest[0].isResponse = true;
-      } else {
-        guest[0].isResponse = false;
+        const { rows: responseRows } = await client.query(
+          `
+          SELECT * FROM "invitation_response"
+          WHERE invitation_id = $1
+          AND guest_id = $2
+          `,
+          [id, guestId],
+        );
+        if (responseRows.length > 0) {
+          console.log(guest)
+          guest[0].isResponse = true;
+        } else {
+          guest[0].isResponse = false;
+        }
+
+        values.push(guest[0]);
       }
-      values.push(guest[0]);
     }
     row.guests = values;
     row.isReceived = false;
@@ -142,6 +147,7 @@ const getAllInvitation = async (client, userId) => {
     let values = [];
     for (let r of guestIdRows) {
       let guestId = r.guest_id;
+      console.log(r)
       const { rows: guest } = await client.query(
         `
                 SELECT id, username FROM "user"
@@ -150,8 +156,9 @@ const getAllInvitation = async (client, userId) => {
             `,
         [guestId],
       );
-      const { rows: impossible } = await client.query(
-        `
+      if (guest.length > 0) {
+        const { rows: impossible } = await client.query(
+          `
         SELECT * FROM "user","invitation_response", "invitation_date", "invitation"
         WHERE invitation_response.guest_id = $1
         AND "user".id = invitation_response.guest_id
@@ -161,30 +168,31 @@ const getAllInvitation = async (client, userId) => {
         AND invitation_date.id = invitation_response.invitation_date_id
         AND invitation_response.impossible = TRUE 
         `,
-        [guestId, id],
-      );
-      if (impossible.length > 0) {
-        guest[0].impossible = true;
-      } else {
-        guest[0].impossible = false;
-      }
+          [guestId, id],
+        );
+        if (impossible.length > 0) {
+          guest[0].impossible = true;
+        } else {
+          guest[0].impossible = false;
+        }
 
-      const { rows: ResponseRows } = await client.query(
-        `
+        const { rows: ResponseRows } = await client.query(
+          `
               SELECT * FROM "invitation_response", "invitation", "user"
               WHERE "invitation".id = $1
               AND invitation.id ="invitation_response".invitation_id
               AND guest_id = $2
               `,
-        [id, guestId],
-      );
-      if (ResponseRows.length > 0) {
-        guest[0].isResponse = true;
-      } else {
-        guest[0].isResponse = false;
-      }
-      if (guest[0].id != userId) {
-        values.push(guest[0]);
+          [id, guestId],
+        );
+        if (ResponseRows.length > 0) {
+          guest[0].isResponse = true;
+        } else {
+          guest[0].isResponse = false;
+        }
+        if (guest[0].id != userId) {
+          values.push(guest[0]);
+        }
       }
     }
 
@@ -193,6 +201,7 @@ const getAllInvitation = async (client, userId) => {
       SELECT plan.id FROM "plan", "invitation_date"
       WHERE invitation_date.id = plan.invitation_date_id
       AND invitation_date.invitation_id=$1
+      AND plan.is_deleted=false
       `,
       [id],
     );

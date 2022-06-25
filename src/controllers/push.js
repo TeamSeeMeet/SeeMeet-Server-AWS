@@ -47,6 +47,9 @@ const pushPlan = async (req, res) => {
     const plan = await pushService.pushPlan(client, today);
     let token = plan.map(a => a.fcm);
     token = [...new Set(token)];
+    token = token.filter(function (item) {
+      return item !== null && item !== undefined && item !== '';
+    });
     pushAlarm.sendPushAlarm(pm.push9title, pm.push9Desc, token);
   } catch (error) {
     console.log(error);

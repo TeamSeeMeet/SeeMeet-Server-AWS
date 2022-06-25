@@ -26,7 +26,7 @@ const returnUser = async (client, email, password) => {
 
   const user = rows[0];
   if (user) {
-    console.log(user)
+    console.log(user);
     if (await bcrypt.compare(password, user.password)) {
       return user;
     } else return null;
@@ -157,7 +157,7 @@ const userWithdrawal = async (client, userId) => {
   const { rows } = await client.query(
     `
     UPDATE "user"
-    SET is_deleted = true
+    SET is_deleted = true, email = null
     WHERE id = $1
     RETURNING *
     `,

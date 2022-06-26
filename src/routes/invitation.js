@@ -8,5 +8,6 @@ router.get('/:invitationId', invitation.getInvitationById);
 router.post('/:invitationId', invitation.confirmInvitation);
 router.put('/:invitationId', invitation.cancelInvitation);
 router.get('/canceled/:invitationId', invitation.getCanceledInvitation);
+router.put('/list/:invitationId', invitation.updateInvisible);
 
 module.exports = router;

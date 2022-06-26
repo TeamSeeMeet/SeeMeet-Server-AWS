@@ -46,4 +46,15 @@ const rejectInvitation = async (client, userId, invitationId) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
-module.exports = { responseInvitation, rejectInvitation };
+const getdateByDateIds = async (client, invitationDateIds) => {
+  const { rows } = await client.query(
+    `
+        SELECT *
+        FROM "invitation_date" i
+        WHERE id IN(${invitationDateIds.join()})
+        `,
+  );
+  return convertSnakeToCamel.keysToCamel(rows);
+}
+
+module.exports = { responseInvitation, rejectInvitation, getdateByDateIds };

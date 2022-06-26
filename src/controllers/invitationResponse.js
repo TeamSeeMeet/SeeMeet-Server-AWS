@@ -5,7 +5,9 @@ const db = require('../db/db');
 const jwtHandlers = require('../modules/jwtHandlers');
 const invitationResponseService = require('../services/InvitationResponseService');
 const invitationService = require('../services/InvitationService');
+const userService = require('../services/userService')
 const { send } = require('../modules/slack');
+const pushAlarm = require('../modules/pushAlarm');
 
 const rejectInvitation = async (req, res) => {
   const { invitationId } = req.params;
@@ -68,6 +70,7 @@ const responseInvitation = async (req, res) => {
   const { invitationId } = req.params;
   const { invitationDateIds } = req.body;
   const { accesstoken } = req.headers;
+  console.log(invitationDateIds)
   if (!invitationId || invitationDateIds.length == 0 || !accesstoken) {
     await send(`
       req.originalURL: ${req.originalUrl}
@@ -132,6 +135,20 @@ const responseInvitation = async (req, res) => {
 
     const data = await invitationResponseService.responseInvitation(client, userId, invitationId, invitationDateIds);
     if (!data) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.INVITATION_RESPONSE_FAIL));
+    const hostId = invitation.hostId
+    const host = await userService.getUserById(client, hostId)
+    const user = await userService.getUserById(client, userId)
+    const dates = await invitationResponseService.getdateByDateIds(client, [invitationDateIds])
+    const confirmMessage = `${user.username}님이 답변을 보냈어요!`
+    const description = []
+    dates.map(value => {
+      const date = new Date(value.date)
+      const month = date.getMonth()
+      const day = date.getDate()
+      description.push(`${month}-${day}-${value.start} 선택!`)
+    })
+    const confirmDescription = description.join('\n')
+    pushAlarm.sendPushAlarm(confirmMessage, confirmDescription, host.fcm)
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.INVITATION_RESPONSE_SUCCESS, data));
   } catch (error) {
     console.log(error);

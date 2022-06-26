@@ -208,6 +208,17 @@ const changePush = async (client, userId, push, fcm) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
+const getUserById = async (client, userId) => {
+  const { rows } = await client.query(
+    `
+    SELECT * FROM "user"
+    WHERE id = $1
+    `, [userId]
+  )
+
+  return convertSnakeToCamel.keysToCamel(rows[0])
+}
+
 module.exports = {
   deleteUser,
   addUser,
@@ -224,4 +235,5 @@ module.exports = {
   updateUserDevice,
   resetPassword,
   changePush,
+  getUserById
 };

@@ -304,6 +304,46 @@ const postInvitation = async (req, res) => {
   }
 };
 
+const updateInvisible = async (req, res) => {
+
+  const { accesstoken } = req.headers
+  const { invitationId } = req.params
+
+  const decodedToken = jwtHandlers.verify(accesstoken);
+  const userId = decodedToken.id;
+
+  if (!userId) {
+    await send(
+      `
+          req.originalURL: ${req.originalUrl}
+          userId: ${userId}
+          `,
+    );
+
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  }
+
+  if (!invitationId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  let client;
+
+  try {
+    client = await db.connect(req);
+
+    await invitationService.updateInvisible(client, userId, invitationId);
+
+    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.READ_ALL_USERS_SUCCESS));
+
+  } catch (error) {
+    console.log(error);
+    await send(error);
+
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   getCanceledInvitation,
   cancelInvitation,
@@ -311,4 +351,5 @@ module.exports = {
   getInvitationById,
   getInvitation,
   postInvitation,
+  updateInvisible
 };

@@ -5,7 +5,7 @@ const db = require('../db/db');
 const jwtHandlers = require('../modules/jwtHandlers');
 const invitationResponseService = require('../services/InvitationResponseService');
 const invitationService = require('../services/InvitationService');
-const userService = require('../services/userService')
+const userService = require('../services/UserService')
 const { send } = require('../modules/slack');
 const pushAlarm = require('../modules/pushAlarm');
 

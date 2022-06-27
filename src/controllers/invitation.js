@@ -8,6 +8,7 @@ const { send } = require('../modules/slack');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 const userService = require('../services/UserService');
+const pushAlarm = require('../modules/pushAlarm');
 
 const getCanceledInvitation = async (req, res) => {
   const { invitationId } = req.params;
@@ -205,6 +206,7 @@ const getInvitation = async (req, res) => {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
     const userId = decodedToken.id;
+    console.log(userId)
     if (!userId) {
       await send(`
         req.originalURL: ${req.originalUrl},
@@ -274,6 +276,10 @@ const postInvitation = async (req, res) => {
       return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     }
 
+    const host = userService.getUserById(client, userId)
+    const invitationMessage = `[씨밋] ${host.username}님이 약속을 보냈어요!`
+    const invitationDescription = invitationTitle
+
     for (let guest of guests) {
       let user = await userService.getUserinfoByuserIds(client, [guest.id]);
       if (user.length == 0) {
@@ -284,6 +290,8 @@ const postInvitation = async (req, res) => {
           `);
         return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
       }
+      const token = user.fcm
+      pushAlarm.sendPushAlarm(invitationMessage, invitationDescription, token)
     }
 
     const invitation = await invitationService.createInvitation(client, userId, invitationTitle, invitationDesc);
@@ -304,6 +312,46 @@ const postInvitation = async (req, res) => {
   }
 };
 
+const updateInvisible = async (req, res) => {
+
+  const { accesstoken } = req.headers
+  const { invitationId } = req.params
+
+  const decodedToken = jwtHandlers.verify(accesstoken);
+  const userId = decodedToken.id;
+
+  if (!userId) {
+    await send(
+      `
+          req.originalURL: ${req.originalUrl}
+          userId: ${userId}
+          `,
+    );
+
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  }
+
+  if (!invitationId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+
+  let client;
+
+  try {
+    client = await db.connect(req);
+
+    await invitationService.updateInvisible(client, userId, invitationId);
+
+    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.READ_ALL_USERS_SUCCESS));
+
+  } catch (error) {
+    console.log(error);
+    await send(error);
+
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   getCanceledInvitation,
   cancelInvitation,
@@ -311,4 +359,5 @@ module.exports = {
   getInvitationById,
   getInvitation,
   postInvitation,
+  updateInvisible
 };

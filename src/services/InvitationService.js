@@ -24,6 +24,7 @@ const getAllInvitation = async (client, userId) => {
       AND invitation.is_deleted = FALSE
       AND invitation.is_confirmed = FALSE
       AND invitation.is_canceled = FALSE
+      AND invitation_user_connection.is_visible = true
     `,
     [userId],
   );
@@ -37,6 +38,7 @@ const getAllInvitation = async (client, userId) => {
       `
       SELECT guest_id FROM "invitation_user_connection"
       WHERE invitation_id = $1
+      AND is_visible = true
       `,
       [id],
     );
@@ -116,6 +118,7 @@ const getAllInvitation = async (client, userId) => {
           AND (invitation.is_confirmed = true
           OR invitation.is_canceled = true)
         AND invitation.is_deleted = false
+        AND invitation.is_visible = true
       `,
     [userId],
   );
@@ -128,6 +131,7 @@ const getAllInvitation = async (client, userId) => {
     AND (invitation.is_confirmed = true
     OR invitation.is_canceled = true)
     AND invitation.is_deleted = false
+    AND invitation_user_connection.is_visible = true
     `,
     [userId],
   );
@@ -140,6 +144,7 @@ const getAllInvitation = async (client, userId) => {
       `
             SELECT guest_id FROM "invitation_user_connection"
             WHERE invitation_id = $1
+            AND is_visible = true
         `,
       [id],
     );
@@ -615,6 +620,34 @@ const getCanceledInvitation = async (client, invitationId) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
+const updateInvisible = async (client, userId, invitationId) => {
+  const { rows: invitationRows } = await client.query(
+    `
+    SELECT * FROM invitation
+    WHERE invitation.id = $1
+    AND invitation.is_deleted=false
+    `, [invitationId]
+  )
+
+  const invitation = convertSnakeToCamel.keysToCamel(invitationRows[0])
+  if (invitation.hostId == userId) {
+    const { rows } = await client.query(
+      `
+      UPDATE invitation
+      SET is_visible=false
+      WHERE id = $1
+      `, [invitationId]
+    )
+  } else {
+    const { rows } = await client.query(`
+    UPDATE invitation_user_connection
+    SET is_visible = false
+    WHERE guest_id = $1
+    `, [userId]
+    )
+  }
+}
+
 module.exports = {
   getAllInvitation,
   createInvitation,
@@ -632,4 +665,5 @@ module.exports = {
   getInvitationDateByInvitationId,
   getCanceledInvitation,
   getRejectGuestByInvitationId,
+  updateInvisible
 };

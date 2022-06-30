@@ -148,7 +148,7 @@ const responseInvitation = async (req, res) => {
       description.push(`${month}-${day}-${value.start} 선택!`)
     })
     const confirmDescription = description.join('\n')
-    pushAlarm.sendPushAlarm(confirmMessage, confirmDescription, host.fcm)
+    pushAlarm.sendPushAlarmWithId(confirmMessage, confirmDescription, invitationId, host.fcm)
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.INVITATION_RESPONSE_SUCCESS, data));
   } catch (error) {
     console.log(error);

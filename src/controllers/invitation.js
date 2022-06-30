@@ -280,6 +280,14 @@ const postInvitation = async (req, res) => {
     const invitationMessage = `[씨밋] ${host.username}님이 약속을 보냈어요!`
     const invitationDescription = invitationTitle
 
+
+    const invitation = await invitationService.createInvitation(client, userId, invitationTitle, invitationDesc);
+    const invitationId = invitation.id;
+    const userConnection = await invitationService.createInvitationUserConnection(client, invitationId, guests);
+    if (userConnection.length == 0) {
+      return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER));
+    }
+    const dates = await invitationService.createInvitationDate(client, invitationId, date, start, end);
     for (let guest of guests) {
       let user = await userService.getUserinfoByuserIds(client, [guest.id]);
       if (user.length == 0) {
@@ -291,16 +299,8 @@ const postInvitation = async (req, res) => {
         return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
       }
       const token = user.fcm
-      pushAlarm.sendPushAlarm(invitationMessage, invitationDescription, token)
+      pushAlarm.sendPushAlarmWithId(invitationMessage, invitationDescription, invitationId, token)
     }
-
-    const invitation = await invitationService.createInvitation(client, userId, invitationTitle, invitationDesc);
-    const invitationId = invitation.id;
-    const userConnection = await invitationService.createInvitationUserConnection(client, invitationId, guests);
-    if (userConnection.length == 0) {
-      return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, responseMessage.NO_USER));
-    }
-    const dates = await invitationService.createInvitationDate(client, invitationId, date, start, end);
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.INVITATION_SUCCESS, { invitation, guests, dates }));
   } catch (error) {
     console.log(error);

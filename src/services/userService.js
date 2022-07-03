@@ -188,11 +188,11 @@ const resetPassword = async (client, id, password) => {
     UPDATE "user"
     SET password = $1
     WHERE "user".id = $2
-    RETURNING *
+    RETURNING "user".*
     `,
     [newPassword, id],
   );
-  return rows;
+  return rows[0];
 };
 
 const changePush = async (client, userId, push, fcm) => {

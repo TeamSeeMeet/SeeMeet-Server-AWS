@@ -205,11 +205,13 @@ const getRefreshToken = async (req, res) => {
   else if (decodedToken == TOKEN_EXPIRED) {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, "만료된 토큰입니다."))
   }
+  const oldOne = refreshtoken
   try {
     client = await db.connect(req);
-    const user = await userService.getUserById(decodedToken.id)
+    const user = await userService.getUserById(client, decodedToken.id)
+    console.log(user)
     if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
-    if (user.refreshtoken != refreshtoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, "잘못된 토큰입니다."))
+    if (user.refreshToken != oldOne) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, "잘못된 토큰입니다."))
     const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
     await userService.updateRefreshToken(client, user.id, refreshtoken);
     const data = {
@@ -218,6 +220,7 @@ const getRefreshToken = async (req, res) => {
     };
     return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, data));
   } catch (error) {
+    console.log(error)
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
   } finally {
     client.release();

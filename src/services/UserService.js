@@ -157,7 +157,7 @@ const userWithdrawal = async (client, userId) => {
   const { rows } = await client.query(
     `
     UPDATE "user"
-    SET is_deleted = true, email = null
+    SET is_deleted = true, email = null, social_id = null
     WHERE id = $1
     RETURNING *
     `,
@@ -213,11 +213,12 @@ const getUserById = async (client, userId) => {
     `
     SELECT * FROM "user"
     WHERE id = $1
-    `, [userId]
-  )
+    `,
+    [userId],
+  );
 
-  return convertSnakeToCamel.keysToCamel(rows[0])
-}
+  return convertSnakeToCamel.keysToCamel(rows[0]);
+};
 
 const updateRefreshToken = async (client, userId, refreshtoken) => {
   const { rows } = await client.query(
@@ -225,9 +226,10 @@ const updateRefreshToken = async (client, userId, refreshtoken) => {
     UPDATE "user"
     SET refresh_token = $1
     WHERE id = $2
-    `, [refreshtoken, userId]
-  )
-}
+    `,
+    [refreshtoken, userId],
+  );
+};
 
 module.exports = {
   deleteUser,
@@ -246,5 +248,5 @@ module.exports = {
   resetPassword,
   changePush,
   getUserById,
-  updateRefreshToken
+  updateRefreshToken,
 };

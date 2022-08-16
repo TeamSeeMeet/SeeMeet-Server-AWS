@@ -6,6 +6,7 @@ const jwtHandlers = require('../modules/jwtHandlers');
 const userService = require('../services/UserService');
 const { send } = require('../modules/slack');
 const jwt = require('jsonwebtoken');
+const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
 
 const authSocialLogin = async (req, res) => {
   const { fcm, socialtoken, provider, name } = req.body;
@@ -20,15 +21,17 @@ const authSocialLogin = async (req, res) => {
           return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.DELETED_USER));
         }
         var user = exuser;
-        const accesstoken = jwtHandlers.socialSign(exuser);
+        const { accesstoken, refreshtoken } = jwtHandlers.socialSign(exuser);
+        await userService.updateRefreshToken(client, user.id, refreshtoken);
         if (user.fcm != fcm) {
           user = await userService.updateUserDevice(client, user.id, fcm);
         }
-        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
+        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken, refreshtoken }));
       } else {
         const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id, fcm);
-        const accesstoken = jwtHandlers.socialSign(user);
-        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
+        const { accesstoken, refreshtoken } = jwtHandlers.socialSign(user);
+        await userService.updateRefreshToken(client, user.id, refreshtoken);
+        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken, refreshtoken }));
       }
     }
     if (provider == 'apple') {
@@ -49,15 +52,17 @@ const authSocialLogin = async (req, res) => {
           return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.DELETED_USER));
         }
         var user = exuser;
-        const accesstoken = jwtHandlers.socialSign(exuser);
+        const { accesstoken, refreshtoken } = jwtHandlers.socialSign(exuser);
+        await userService.updateRefreshToken(client, user.id, refreshtoken);
         if (user.fcm != fcm) {
           user = await userService.updateUserDevice(client, user.id, fcm);
         }
-        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken }));
+        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken, refreshtoken }));
       } else {
         const user = await userService.addSocialUser(client, name, provider, userData.sub, fcm);
-        const accesstoken = jwtHandlers.socialSign(user);
-        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken }));
+        const { accesstoken, refreshtoken } = jwtHandlers.socialSign(user);
+        await userService.updateRefreshToken(client, user.id, refreshtoken);
+        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken, refreshtoken }));
       }
     }
   } catch (error) {
@@ -115,10 +120,12 @@ const signUp = async (req, res) => {
       return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_EMAIL));
     }
     const newUser = await userService.addUser(client, email, password);
-    const accesstoken = jwtHandlers.sign(newUser);
+    const { accesstoken, refreshtoken } = jwtHandlers.sign(newUser);
+    await userService.updateRefreshToken(client, newUser.id, refreshtoken);
     const data = {
       newUser,
       accesstoken,
+      refreshtoken
     };
     return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, data));
   } catch (error) {
@@ -141,13 +148,15 @@ const authLogin = async (req, res) => {
     }
     let user = await userService.returnUser(client, email, password);
     if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
-    const accesstoken = jwtHandlers.sign(user);
+    const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
+    await userService.updateRefreshToken(client, user.id, refreshtoken);
     if (user.fcm != fcm) {
       user = await userService.updateUserDevice(client, user.id, fcm);
     }
     const data = {
       user,
       accesstoken,
+      refreshtoken
     };
     return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, data));
   } catch (error) {
@@ -184,10 +193,42 @@ const authWithdrawal = async (req, res) => {
   }
 };
 
+const getRefreshToken = async (req, res) => {
+  const { refreshtoken } = req.headers;
+  if (!refreshtoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  let client;
+  let decodedToken
+  decodedToken = jwtHandlers.verify(refreshtoken);
+  if (decodedToken == TOKEN_INVALID) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, "잘못된 토큰입니다."));
+  }
+  else if (decodedToken == TOKEN_EXPIRED) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, "만료된 토큰입니다."))
+  }
+  try {
+    client = await db.connect(req);
+    const user = await userService.getUserById(decodedToken.id)
+    if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
+    if (user.refreshtoken != refreshtoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, "잘못된 토큰입니다."))
+    const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
+    await userService.updateRefreshToken(client, user.id, refreshtoken);
+    const data = {
+      accesstoken,
+      refreshtoken
+    };
+    return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, data));
+  } catch (error) {
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   authSocialLogin,
   authSignup,
   signUp,
   authLogin,
   authWithdrawal,
+  getRefreshToken
 };

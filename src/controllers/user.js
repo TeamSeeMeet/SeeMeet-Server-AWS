@@ -46,7 +46,7 @@ const resetPassword = async (req, res) => {
     if (password != passwordConfirm) {
       return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, '패스워드가 일치하지 않습니다.'));
     }
-
+    console.log(userId)
     const data = await userService.resetPassword(client, userId, password);
     res.status(statusCode.OK).send(util.success(statusCode.OK, '비밀번호 변경 성공', data));
   } catch (error) {

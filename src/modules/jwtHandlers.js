@@ -5,9 +5,15 @@ const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
 const secretKey = process.env.JWT_SECRET;
 const options = {
   algorithm: 'HS256',
-  expiresIn: '30d', //30일동안 토큰 유효
+  expiresIn: '3d', //3일동안 토큰 유효
   issuer: 'wesopt',
 };
+
+const refreshOption = {
+  algorithm: 'HS256',
+  expiresIn: '90d', //90일동안 토큰 유효
+  issuer: 'wesopt',
+}
 
 // id, email, name, idFirebase가 담긴 JWT를 발급합니다.
 const sign = user => {
@@ -19,6 +25,7 @@ const sign = user => {
 
   const result = {
     accesstoken: jwt.sign(payload, secretKey, options),
+    refreshtoken: jwt.sign(payload, secretKey, refreshOption)
   };
   return result;
 };
@@ -32,6 +39,7 @@ const socialSign = user => {
 
   const result = {
     accesstoken: jwt.sign(payload, secretKey, options),
+    refreshtoken: jwt.sign(payload, secretKey, refreshOption)
   };
   return result;
 };

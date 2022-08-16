@@ -7,4 +7,5 @@ router.put('/', auth.authSignup);
 router.post('/', auth.signUp);
 router.post('/login', auth.authLogin);
 router.put('/withdrawal', auth.authWithdrawal);
+router.post('/refresh', auth.getRefreshToken);
 module.exports = router;

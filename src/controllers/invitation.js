@@ -18,8 +18,9 @@ const getCanceledInvitation = async (req, res) => {
     client = await db.connect(req);
 
     const data = await invitationService.getCanceledInvitation(client, invitationId);
+    const host = await userService.getUserById(client, data.hostId)
     const guest = await invitationService.getGuestByInvitationId(client, invitationId);
-    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.READ_INVITATION_SUCCESS, { ...data, guest }));
+    res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.READ_INVITATION_SUCCESS, { ...data, hostName: host.username, guest }));
   } catch (error) {
     console.log(error);
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));

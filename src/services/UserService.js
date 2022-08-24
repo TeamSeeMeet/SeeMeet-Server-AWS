@@ -109,16 +109,16 @@ const getUserBySocialId = async (client, socialId) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
-const addSocialUser = async (client, name, provider, socialId, fcm) => {
+const addSocialUser = async (client, name, provider, socialId, fcm, email) => {
   const { rows } = await client.query(
     `
     INSERT INTO "user"
-    (username, provider, social_id, fcm)
+    (username, provider, social_id, fcm, email)
     VALUES
-    ($1, $2, $3, $4)
+    ($1, $2, $3, $4, $5)
     RETURNING *
     `,
-    [name, provider, socialId, fcm],
+    [name, provider, socialId, fcm, email],
   );
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };

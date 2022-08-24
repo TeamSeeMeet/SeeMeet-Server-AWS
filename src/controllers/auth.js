@@ -7,6 +7,7 @@ const userService = require('../services/UserService');
 const { send } = require('../modules/slack');
 const jwt = require('jsonwebtoken');
 const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
+const e = require('express');
 
 const authSocialLogin = async (req, res) => {
   const { fcm, socialtoken, provider, name } = req.body;
@@ -18,19 +19,21 @@ const authSocialLogin = async (req, res) => {
       console.log(userData);
       let exuser = await userService.getUserBySocialId(client, userData.id);
       console.log(exuser);
-      if (exuser.isDeleted === true) {
-        exuser = null;
-      }
+
       if (exuser) {
-        var user = exuser;
-        const { accesstoken, refreshtoken } = jwtHandlers.socialSign(exuser);
-        await userService.updateRefreshToken(client, user.id, refreshtoken);
-        if (user.fcm != fcm) {
-          user = await userService.updateUserDevice(client, user.id, fcm);
+        if (exuser.isDeleted == false) {
+          var user = exuser;
+          const { accesstoken, refreshtoken } = jwtHandlers.socialSign(exuser);
+          await userService.updateRefreshToken(client, user.id, refreshtoken);
+          if (user.fcm != fcm) {
+            user = await userService.updateUserDevice(client, user.id, fcm);
+          }
+          return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken, refreshtoken }));
+        } else {
+          exuser = null;
         }
-        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken, refreshtoken }));
       } else {
-        const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id, fcm);
+        const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id, fcm, userData.kakao_account.email);
         const { accesstoken, refreshtoken } = jwtHandlers.socialSign(user);
         await userService.updateRefreshToken(client, user.id, refreshtoken);
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken, refreshtoken }));
@@ -49,19 +52,20 @@ const authSocialLogin = async (req, res) => {
       };
       const userData = await getAppleUserBySocialtoken(socialtoken);
       let exuser = await userService.getUserBySocialId(client, userData.sub);
-      if (exuser.isDeleted === true) {
-        exuser = null;
-      }
       if (exuser) {
-        var user = exuser;
-        const { accesstoken, refreshtoken } = jwtHandlers.socialSign(exuser);
-        await userService.updateRefreshToken(client, user.id, refreshtoken);
-        if (user.fcm != fcm) {
-          user = await userService.updateUserDevice(client, user.id, fcm);
+        if (exuser.isDeleted == false) {
+          var user = exuser;
+          const { accesstoken, refreshtoken } = jwtHandlers.socialSign(exuser);
+          await userService.updateRefreshToken(client, user.id, refreshtoken);
+          if (user.fcm != fcm) {
+            user = await userService.updateUserDevice(client, user.id, fcm);
+          }
+          return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken, refreshtoken }));
+        } else {
+          exuser = null;
         }
-        return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, { user, accesstoken, refreshtoken }));
       } else {
-        const user = await userService.addSocialUser(client, name, provider, userData.sub, fcm);
+        const user = await userService.addSocialUser(client, name, provider, userData.sub, fcm, appleUser.email);
         const { accesstoken, refreshtoken } = jwtHandlers.socialSign(user);
         await userService.updateRefreshToken(client, user.id, refreshtoken);
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken, refreshtoken }));

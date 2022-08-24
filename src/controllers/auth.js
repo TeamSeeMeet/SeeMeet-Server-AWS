@@ -16,12 +16,12 @@ const authSocialLogin = async (req, res) => {
     if (provider == 'kakao') {
       const userData = await userService.getKakaoUserBySocialtoken(client, socialtoken);
       console.log(userData);
-      const exuser = await userService.getUserBySocialId(client, userData.id);
+      let exuser = await userService.getUserBySocialId(client, userData.id);
       console.log(exuser);
+      if (exuser.isDeleted === true) {
+        exuser = null;
+      }
       if (exuser) {
-        if (exuser.isDeleted === true) {
-          return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.DELETED_USER));
-        }
         var user = exuser;
         const { accesstoken, refreshtoken } = jwtHandlers.socialSign(exuser);
         await userService.updateRefreshToken(client, user.id, refreshtoken);
@@ -48,11 +48,11 @@ const authSocialLogin = async (req, res) => {
         }
       };
       const userData = await getAppleUserBySocialtoken(socialtoken);
-      const exuser = await userService.getUserBySocialId(client, userData.sub);
+      let exuser = await userService.getUserBySocialId(client, userData.sub);
+      if (exuser.isDeleted === true) {
+        exuser = null;
+      }
       if (exuser) {
-        if (exuser.isDeleted === true) {
-          return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.DELETED_USER));
-        }
         var user = exuser;
         const { accesstoken, refreshtoken } = jwtHandlers.socialSign(exuser);
         await userService.updateRefreshToken(client, user.id, refreshtoken);

@@ -5,13 +5,13 @@ const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
 const secretKey = process.env.JWT_SECRET;
 const options = {
   algorithm: 'HS256',
-  expiresIn: '3d', //3일동안 토큰 유효
+  expiresIn: '3m', //3일동안 토큰 유효
   issuer: 'wesopt',
 };
 
 const refreshOption = {
   algorithm: 'HS256',
-  expiresIn: '90d', //90일동안 토큰 유효
+  expiresIn: '5m', //90일동안 토큰 유효
   issuer: 'wesopt',
 }
 

@@ -35,7 +35,12 @@ const authSocialLogin = async (req, res) => {
       } else {
         const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id, fcm, userData.kakao_account.email);
         const { accesstoken, refreshtoken } = jwtHandlers.socialSign(user);
-        await userService.updateRefreshToken(client, user.id, refreshtoken);
+        const oldRefreshToken = await userService.getRefreshToken(client, user.id)
+        if (oldRefreshToken) {
+          await userService.updateRefreshToken(client, user.id, refreshtoken);
+        } else {
+          await userService.addRefreshToken(client, user.id, refreshtoken)
+        }
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken, refreshtoken }));
       }
     }
@@ -67,7 +72,12 @@ const authSocialLogin = async (req, res) => {
       } else {
         const user = await userService.addSocialUser(client, name, provider, userData.sub, fcm, appleUser.email);
         const { accesstoken, refreshtoken } = jwtHandlers.socialSign(user);
-        await userService.updateRefreshToken(client, user.id, refreshtoken);
+        const oldRefreshToken = await userService.getRefreshToken(client, user.id)
+        if (oldRefreshToken) {
+          await userService.updateRefreshToken(client, user.id, refreshtoken);
+        } else {
+          await userService.addRefreshToken(client, user.id, refreshtoken)
+        }
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken, refreshtoken }));
       }
     }
@@ -127,7 +137,7 @@ const signUp = async (req, res) => {
     }
     const newUser = await userService.addUser(client, email, password);
     const { accesstoken, refreshtoken } = jwtHandlers.sign(newUser);
-    await userService.updateRefreshToken(client, newUser.id, refreshtoken);
+    await userService.addRefreshToken(client, newUser.id, refreshtoken);
     const data = {
       newUser,
       accesstoken,
@@ -155,7 +165,13 @@ const authLogin = async (req, res) => {
     let user = await userService.returnUser(client, email, password);
     if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
     const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
-    await userService.updateRefreshToken(client, user.id, refreshtoken);
+    const oldRefreshToken = await userService.getRefreshToken(client, user.id)
+    if (oldRefreshToken) {
+      await userService.updateRefreshToken(client, user.id, refreshtoken);
+    }
+    else {
+      await userService.addRefreshToken(client, user.id, refreshtoken)
+    }
     if (user.fcm != fcm) {
       user = await userService.updateUserDevice(client, user.id, fcm);
     }
@@ -206,17 +222,17 @@ const getRefreshToken = async (req, res) => {
   let decodedToken;
   decodedToken = jwtHandlers.verify(refreshtoken);
   if (decodedToken == TOKEN_INVALID) {
-    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, '잘못된 토큰입니다.'));
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.UNAUTHORIZED, '잘못된 토큰입니다.'));
   } else if (decodedToken == TOKEN_EXPIRED) {
-    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, '만료된 토큰입니다.'));
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.UNAUTHORIZED, '만료된 토큰입니다.'));
   }
   const oldOne = refreshtoken;
   try {
     client = await db.connect(req);
     const user = await userService.getUserById(client, decodedToken.id);
     console.log(user);
-    if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
-    if (user.refreshToken != oldOne) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, '잘못된 토큰입니다.'));
+    if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
+    if (user.refreshToken != oldOne) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.UNAUTHORIZED, '잘못된 토큰입니다.'));
     const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
     await userService.updateRefreshToken(client, user.id, refreshtoken);
     const data = {

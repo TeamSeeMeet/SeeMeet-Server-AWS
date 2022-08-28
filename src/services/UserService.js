@@ -223,13 +223,23 @@ const getUserById = async (client, userId) => {
 const updateRefreshToken = async (client, userId, refreshtoken) => {
   const { rows } = await client.query(
     `
-    UPDATE "user"
+    UPDATE "user_refresh_connection"
     SET refresh_token = $1
-    WHERE id = $2
+    WHERE user_id = $2
     `,
     [refreshtoken, userId],
   );
 };
+
+const getRefreshToken = async (client, userId) => {
+  const { rows } = await client.query(
+    `
+      SELECT "user_refresh_connection"
+      WHERE user_id = $1
+    `, [userId]
+  )
+  return convertSnakeToCamel.keysToCamel(rows[0])
+}
 
 module.exports = {
   deleteUser,

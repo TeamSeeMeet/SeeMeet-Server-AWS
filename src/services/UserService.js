@@ -250,7 +250,7 @@ const addRefreshToken = async (client, userId, refresh_token) => {
       ($1, $2)
       RETURNING *
 
-    `[userId, refresh_token]
+    `, [userId, refresh_token]
   )
 }
 

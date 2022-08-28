@@ -234,7 +234,7 @@ const updateRefreshToken = async (client, userId, refreshtoken) => {
 const getRefreshToken = async (client, userId) => {
   const { rows } = await client.query(
     `
-      SELECT "user_refresh_connection"
+      SELECT * FROM "user_refresh_connection"
       WHERE user_id = $1
     `, [userId]
   )

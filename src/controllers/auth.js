@@ -167,12 +167,15 @@ const authLogin = async (req, res) => {
     const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
     const oldRefreshToken = await userService.getRefreshToken(client, user.id)
     if (oldRefreshToken) {
+      console.log(client)
       await userService.updateRefreshToken(client, user.id, refreshtoken);
     }
     else {
+      console.log(client)
       await userService.addRefreshToken(client, user.id, refreshtoken)
     }
     if (user.fcm != fcm) {
+      console.log(client)
       user = await userService.updateUserDevice(client, user.id, fcm);
     }
     const data = {

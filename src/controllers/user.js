@@ -7,6 +7,7 @@ const userService = require('../services/UserService');
 const friendService = require('../services/FriendService');
 const { response } = require('express');
 const { password } = require('../config');
+const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
 
 const deleteUser = async (req, res) => {
   const { accesstoken } = req.headers;

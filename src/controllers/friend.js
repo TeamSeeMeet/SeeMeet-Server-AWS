@@ -8,6 +8,7 @@ const userService = require('../services/UserService');
 const { send } = require('../modules/slack');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
+const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
 
 const addFriend = async (req, res) => {
   const { accesstoken } = req.headers;

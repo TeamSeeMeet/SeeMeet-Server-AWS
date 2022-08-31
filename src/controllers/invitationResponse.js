@@ -8,6 +8,7 @@ const invitationService = require('../services/InvitationService');
 const userService = require('../services/UserService')
 const { send } = require('../modules/slack');
 const pushAlarm = require('../modules/pushAlarm');
+const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
 
 const rejectInvitation = async (req, res) => {
   const { invitationId } = req.params;

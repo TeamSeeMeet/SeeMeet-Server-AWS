@@ -16,6 +16,12 @@ const deleteUser = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
 
@@ -40,6 +46,12 @@ const resetPassword = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
 
@@ -66,6 +78,12 @@ const changePush = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
 

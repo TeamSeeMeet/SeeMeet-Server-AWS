@@ -99,6 +99,12 @@ const authSignup = async (req, res) => {
   if (!name || !nickname) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   let client;
   const decodedToken = jwtHandlers.verify(accesstoken);
+  if (decodedToken == TOKEN_INVALID) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+  }
+  if (decodedToken == TOKEN_EXPIRED) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+  }
   const userId = decodedToken.id;
 
   if (typeof userId == 'undefined') {
@@ -199,6 +205,12 @@ const authWithdrawal = async (req, res) => {
   if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
   let client;
   const decodedToken = jwtHandlers.verify(accesstoken);
+  if (decodedToken == TOKEN_INVALID) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+  }
+  if (decodedToken == TOKEN_EXPIRED) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+  }
   const userId = decodedToken.id;
   if (typeof userId == 'undefined') {
     return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));

@@ -19,6 +19,12 @@ const getPlanCome = async (req, res) => {
   let client;
   try {
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     client = await db.connect(req);
     if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
@@ -58,6 +64,12 @@ const getPlanByDate = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     const plan = await planService.getDatePlan(client, userId, parseInt(dateId));
@@ -83,6 +95,12 @@ const deletePlan = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
 
     const plan = await planService.deletePlan(client, userId, planId);
@@ -109,6 +127,12 @@ const getPlanById = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
 
     const plan = await planService.getDetailPlan(client, planId, userId);
@@ -136,6 +160,12 @@ const getPlanByMonth = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     const plan = await planService.getMonthPlan(client, userId, parseInt(year), parseInt(month));
@@ -165,6 +195,12 @@ const getPlanLast = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
     const plan = await planService.getLastPlan(client, userId, date);
@@ -194,6 +230,12 @@ const getPlan3Month = async (req, res) => {
     client = await db.connect(req);
 
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId || !accesstoken) {
       await send(`userId ${userId}\naccesstoken: ${accesstoken}`);

@@ -16,6 +16,12 @@ const uploadFileToS3 = async (req, res) => {
   const { originalname, location } = image;
   if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, message.TOKEN));
   const decodedToken = jwtHandlers.verify(accesstoken);
+  if (decodedToken == TOKEN_INVALID) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+  }
+  if (decodedToken == TOKEN_EXPIRED) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+  }
   const userId = decodedToken.id;
 
   let client;

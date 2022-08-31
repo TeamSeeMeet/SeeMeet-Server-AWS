@@ -18,6 +18,12 @@ const rejectInvitation = async (req, res) => {
   let client;
 
   const decodedToken = jwtHandlers.verify(accesstoken);
+  if (decodedToken == TOKEN_INVALID) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+  }
+  if (decodedToken == TOKEN_EXPIRED) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+  }
   const userId = decodedToken.id;
 
   try {
@@ -84,6 +90,12 @@ const responseInvitation = async (req, res) => {
 
   let client;
   const decodedToken = jwtHandlers.verify(accesstoken);
+  if (decodedToken == TOKEN_INVALID) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+  }
+  if (decodedToken == TOKEN_EXPIRED) {
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+  }
   const userId = decodedToken.id;
 
   try {

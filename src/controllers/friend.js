@@ -22,6 +22,12 @@ const addFriend = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) {
       await send(`userId : ${userId}`);
@@ -80,6 +86,12 @@ const blockFriend = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) {
       await send(`userId : ${userId}`);
@@ -124,6 +136,12 @@ const cancelBlockFriend = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) {
       await send(`userId : ${userId}`);
@@ -162,6 +180,12 @@ const getFriend = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) {
       await send(`userId : ${userId}`);
@@ -210,6 +234,12 @@ const searchFriend = async (req, res) => {
   try {
     client = await db.connect(req);
     const decodedToken = jwtHandlers.verify(accesstoken);
+    if (decodedToken == TOKEN_INVALID) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    }
+    if (decodedToken == TOKEN_EXPIRED) {
+      return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    }
     const userId = decodedToken.id;
     if (!userId) {
       await send(`userId : ${userId}`);

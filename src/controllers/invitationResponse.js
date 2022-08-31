@@ -14,7 +14,7 @@ const rejectInvitation = async (req, res) => {
   const { accesstoken } = req.headers;
 
   if (!invitationId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
-
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   let client;
 
   const decodedToken = jwtHandlers.verify(accesstoken);
@@ -70,6 +70,7 @@ const responseInvitation = async (req, res) => {
   const { invitationId } = req.params;
   const { invitationDateIds } = req.body;
   const { accesstoken } = req.headers;
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   console.log(invitationDateIds)
   if (!invitationId || invitationDateIds.length == 0 || !accesstoken) {
     await send(`

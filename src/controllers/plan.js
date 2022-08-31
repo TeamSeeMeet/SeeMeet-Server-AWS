@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 
 const getPlanCome = async (req, res) => {
   const { accesstoken } = req.headers;
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   const { year, month } = req.params;
   if (!year || !month || !accesstoken) {
     await send(`year: ${year}\nmonth: ${month}\naccesstoken: ${accesstoken}\n`);
@@ -47,6 +48,7 @@ const getPlanCome = async (req, res) => {
 
 const getPlanByDate = async (req, res) => {
   const { accesstoken } = req.headers;
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   const { dateId } = req.params;
   if (!dateId || !accesstoken) {
     await send(`dateId: ${dateId} \naccesstoken: ${accesstoken}`);
@@ -74,7 +76,7 @@ const getPlanByDate = async (req, res) => {
 const deletePlan = async (req, res) => {
   const { planId } = req.params;
   const { accesstoken } = req.headers;
-
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   if (!planId) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   let client;
 
@@ -98,6 +100,7 @@ const deletePlan = async (req, res) => {
 const getPlanById = async (req, res) => {
   const { accesstoken } = req.headers;
   const { planId } = req.params;
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   if (!planId || !accesstoken) {
     await send(`planId: ${planId} \naccesstoken: ${accesstoken}`);
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
@@ -124,7 +127,7 @@ const getPlanById = async (req, res) => {
 const getPlanByMonth = async (req, res) => {
   const { accesstoken } = req.headers;
   const { year, month } = req.params;
-
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   if (!year || !month || !accesstoken) {
     await send(`year: ${year}\nmonth: ${month}\naccesstoken: ${accesstoken}`);
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
@@ -151,6 +154,7 @@ const getPlanByMonth = async (req, res) => {
 const getPlanLast = async (req, res) => {
   const { accesstoken } = req.headers;
   const { year, month, day } = req.params;
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   if (!year || !month || !day || !accesstoken) {
     await send(`year: ${year}\nmonth: ${month}\nday: ${day}\naccesstoken: ${accesstoken}`);
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
@@ -179,7 +183,7 @@ const getPlanLast = async (req, res) => {
 const getPlan3Month = async (req, res) => {
   const { accesstoken } = req.headers;
   const { year, month } = req.params;
-
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   if (!year || !month) {
     await send(`year: ${year}\nmonth: ${month}\n`);
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));

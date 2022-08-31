@@ -95,13 +95,14 @@ const authSocialLogin = async (req, res) => {
 const authSignup = async (req, res) => {
   const { accesstoken } = req.headers;
   const { name, nickname } = req.body;
-  if (!accesstoken || !name || !nickname) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+  if (!name || !nickname) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   let client;
   const decodedToken = jwtHandlers.verify(accesstoken);
   const userId = decodedToken.id;
 
   if (typeof userId == 'undefined') {
-    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN));
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   }
   try {
     client = await db.connect(req);
@@ -163,7 +164,7 @@ const authLogin = async (req, res) => {
       return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.INVALID_EMAIL));
     }
     let user = await userService.returnUser(client, email, password);
-    if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.LOGIN_FAIL));
+    if (!user) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
     const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
     const oldRefreshToken = await userService.getRefreshToken(client, user.id)
     if (oldRefreshToken) {
@@ -195,12 +196,12 @@ const authLogin = async (req, res) => {
 //회원탈퇴
 const authWithdrawal = async (req, res) => {
   const { accesstoken } = req.headers;
-  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
   let client;
   const decodedToken = jwtHandlers.verify(accesstoken);
   const userId = decodedToken.id;
   if (typeof userId == 'undefined') {
-    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.TOKEN));
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   }
   try {
     client = await db.connect(req);
@@ -220,14 +221,14 @@ const authWithdrawal = async (req, res) => {
 
 const getRefreshToken = async (req, res) => {
   const { refreshtoken } = req.headers;
-  if (!refreshtoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  if (!refreshtoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.NULL_VALUE));
   let client;
   let decodedToken;
   decodedToken = jwtHandlers.verify(refreshtoken);
   if (decodedToken == TOKEN_INVALID) {
-    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.UNAUTHORIZED, '잘못된 토큰입니다.'));
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, '잘못된 토큰입니다.'));
   } else if (decodedToken == TOKEN_EXPIRED) {
-    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.UNAUTHORIZED, '만료된 토큰입니다.'));
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, '만료된 토큰입니다.'));
   }
   const oldOne = refreshtoken;
   try {

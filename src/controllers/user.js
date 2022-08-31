@@ -10,7 +10,7 @@ const { password } = require('../config');
 
 const deleteUser = async (req, res) => {
   const { accesstoken } = req.headers;
-  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
 
   let client;
   try {
@@ -34,7 +34,7 @@ const deleteUser = async (req, res) => {
 const resetPassword = async (req, res) => {
   const { accesstoken } = req.headers;
   const { password, passwordConfirm } = req.body;
-  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
 
   let client;
   try {
@@ -60,7 +60,7 @@ const resetPassword = async (req, res) => {
 const changePush = async (req, res) => {
   const { accesstoken } = req.headers;
   const { push, fcm } = req.body;
-  if (!accesstoken) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
 
   let client;
   try {

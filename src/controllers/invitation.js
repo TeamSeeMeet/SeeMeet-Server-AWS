@@ -32,6 +32,7 @@ const getCanceledInvitation = async (req, res) => {
 const cancelInvitation = async (req, res) => {
   const { invitationId } = req.params;
   const { accesstoken } = req.headers;
+
   if (!invitationId) {
     await send(`
         req.originalURL: ${req.originalUrl}

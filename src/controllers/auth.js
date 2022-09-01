@@ -174,15 +174,12 @@ const authLogin = async (req, res) => {
     const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
     const oldRefreshToken = await userService.getRefreshToken(client, user.id)
     if (oldRefreshToken) {
-      console.log(client)
       await userService.updateRefreshToken(client, user.id, refreshtoken);
     }
     else {
-      console.log(client)
       await userService.addRefreshToken(client, user.id, refreshtoken)
     }
     if (user.fcm != fcm) {
-      console.log(client)
       user = await userService.updateUserDevice(client, user.id, fcm);
     }
     const data = {
@@ -237,6 +234,7 @@ const getRefreshToken = async (req, res) => {
   let client;
   let decodedToken;
   decodedToken = jwtHandlers.verify(refreshtoken);
+  console.log(decodedToken)
   if (decodedToken == TOKEN_INVALID) {
     return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, '잘못된 토큰입니다.'));
   } else if (decodedToken == TOKEN_EXPIRED) {
@@ -248,14 +246,13 @@ const getRefreshToken = async (req, res) => {
     const user = await userService.getUserById(client, decodedToken.id);
     console.log(user);
     if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
-    if (user.refreshToken != oldOne) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.UNAUTHORIZED, '잘못된 토큰입니다.'));
     const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
     await userService.updateRefreshToken(client, user.id, refreshtoken);
     const data = {
       accesstoken,
       refreshtoken,
     };
-    return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.LOGIN_SUCCESS, data));
+    return res.status(statusCode.OK).send(util.success(statusCode.OK, "토큰 갱신", data));
   } catch (error) {
     console.log(error);
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));

@@ -234,7 +234,6 @@ const getRefreshToken = async (req, res) => {
   let client;
   let decodedToken;
   decodedToken = jwtHandlers.verify(refreshtoken);
-  console.log(decodedToken)
   if (decodedToken == TOKEN_INVALID) {
     return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, '잘못된 토큰입니다.'));
   } else if (decodedToken == TOKEN_EXPIRED) {
@@ -244,7 +243,6 @@ const getRefreshToken = async (req, res) => {
   try {
     client = await db.connect(req);
     const user = await userService.getUserById(client, decodedToken.id);
-    console.log(user);
     if (!user) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
     const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
     await userService.updateRefreshToken(client, user.id, refreshtoken);

@@ -1,3 +1,4 @@
+const e = require('express');
 const jwt = require('jsonwebtoken');
 const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
 
@@ -57,7 +58,8 @@ const verify = token => {
       console.log('invalid token');
       return TOKEN_INVALID;
     } else {
-      console.log('invalid token');
+      console.log(e)
+      console.log('what?');
       return 9999;
     }
   }

@@ -173,6 +173,7 @@ const cancelBlockFriend = async (req, res) => {
 
 const getFriend = async (req, res) => {
   const { accesstoken } = req.headers;
+  console.log("list" + accesstoken)
   if (!accesstoken) {
     await send(`accesstoken : ${accesstoken}`);
     if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));

@@ -11,6 +11,7 @@ const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
 
 const getPlanCome = async (req, res) => {
   const { accesstoken } = req.headers;
+  console.log("come" + accesstoken)
   if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   const { year, month } = req.params;
   if (!year || !month || !accesstoken) {
@@ -184,6 +185,7 @@ const getPlanByMonth = async (req, res) => {
 
 const getPlanLast = async (req, res) => {
   const { accesstoken } = req.headers;
+  console.log("last: " + accesstoken)
   const { year, month, day } = req.params;
   if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   if (!year || !month || !day || !accesstoken) {

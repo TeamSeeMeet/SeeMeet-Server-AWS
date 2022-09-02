@@ -58,7 +58,7 @@ const verify = token => {
       console.log('invalid token');
       return TOKEN_INVALID;
     } else {
-      console.log(e)
+      console.log(err.message)
       console.log('what?');
       return 9999;
     }

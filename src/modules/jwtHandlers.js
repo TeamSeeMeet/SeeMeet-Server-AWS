@@ -58,7 +58,7 @@ const verify = token => {
       return TOKEN_INVALID;
     } else {
       console.log('invalid token');
-      return TOKEN_INVALID;
+      return 9999;
     }
   }
   // 해독 / 인증이 완료되면, 해독된 상태의 JWT를 반환합니다.

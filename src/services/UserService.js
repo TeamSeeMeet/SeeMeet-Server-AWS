@@ -25,10 +25,11 @@ const returnUser = async (client, email, password) => {
   );
 
   const user = rows[0];
+
   if (user) {
     console.log(user);
     if (await bcrypt.compare(password, user.password)) {
-      return user;
+      return convertSnakeToCamel.keysToCamel(user);
     } else return null;
   } else return null;
 };

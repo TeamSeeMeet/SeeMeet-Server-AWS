@@ -46,17 +46,15 @@ const getAllInvitation = async (client, userId) => {
     let values = [];
     for (let r of guestIdRows) {
       let guestId = r.guest_id;
-      console.log(r)
+      console.log(r);
       const { rows: guest } = await client.query(
         `
           SELECT id, username FROM "user"
           WHERE id = $1
-          AND is_deleted = FALSE
           `,
         [guestId],
       );
       if (guest.length > 0) {
-
         const { rows: responseRows } = await client.query(
           `
           SELECT * FROM "invitation_response"
@@ -66,7 +64,7 @@ const getAllInvitation = async (client, userId) => {
           [id, guestId],
         );
         if (responseRows.length > 0) {
-          console.log(guest)
+          console.log(guest);
           guest[0].isResponse = true;
         } else {
           guest[0].isResponse = false;
@@ -86,7 +84,6 @@ const getAllInvitation = async (client, userId) => {
       `
             SELECT id, username FROM "user"
             WHERE id = $1
-            AND is_deleted = FALSE
             `,
       [row.host_id],
     );
@@ -152,12 +149,11 @@ const getAllInvitation = async (client, userId) => {
     let values = [];
     for (let r of guestIdRows) {
       let guestId = r.guest_id;
-      console.log(r)
+      console.log(r);
       const { rows: guest } = await client.query(
         `
                 SELECT id, username FROM "user"
                 WHERE id = $1
-                AND is_deleted = FALSE
             `,
         [guestId],
       );
@@ -217,20 +213,20 @@ const getAllInvitation = async (client, userId) => {
       row.planId = planRows[0].id;
     }
   }
-  newRows.map((value) => {
-    const date1 = new Date(value.created_at)
-    const date2 = new Date()
+  newRows.map(value => {
+    const date1 = new Date(value.created_at);
+    const date2 = new Date();
     const diffTime = Math.abs(date2 - date1);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    value.days = diffDays
-  })
-  newConfirmedRows.map((value) => {
-    const date1 = new Date(value.created_at)
-    const date2 = new Date()
+    value.days = diffDays;
+  });
+  newConfirmedRows.map(value => {
+    const date1 = new Date(value.created_at);
+    const date2 = new Date();
     const diffTime = Math.abs(date2 - date1);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    value.days = diffDays
-  })
+    value.days = diffDays;
+  });
   const data = { invitations: newRows, confirmedAndCanceld: newConfirmedRows };
 
   return convertSnakeToCamel.keysToCamel(data);
@@ -626,27 +622,31 @@ const updateInvisible = async (client, userId, invitationId) => {
     SELECT * FROM invitation
     WHERE invitation.id = $1
     AND invitation.is_deleted=false
-    `, [invitationId]
-  )
+    `,
+    [invitationId],
+  );
 
-  const invitation = convertSnakeToCamel.keysToCamel(invitationRows[0])
+  const invitation = convertSnakeToCamel.keysToCamel(invitationRows[0]);
   if (invitation.hostId == userId) {
     const { rows } = await client.query(
       `
       UPDATE invitation
       SET is_visible=false
       WHERE id = $1
-      `, [invitationId]
-    )
+      `,
+      [invitationId],
+    );
   } else {
-    const { rows } = await client.query(`
+    const { rows } = await client.query(
+      `
     UPDATE invitation_user_connection
     SET is_visible = false
     WHERE guest_id = $1
-    `, [userId]
-    )
+    `,
+      [userId],
+    );
   }
-}
+};
 
 module.exports = {
   getAllInvitation,
@@ -665,5 +665,5 @@ module.exports = {
   getInvitationDateByInvitationId,
   getCanceledInvitation,
   getRejectGuestByInvitationId,
-  updateInvisible
+  updateInvisible,
 };

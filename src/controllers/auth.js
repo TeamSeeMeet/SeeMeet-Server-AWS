@@ -35,21 +35,23 @@ const authSocialLogin = async (req, res) => {
       } else {
         const user = await userService.addSocialUser(client, userData.properties.nickname, provider, userData.id, fcm, userData.kakao_account.email);
         const { accesstoken, refreshtoken } = jwtHandlers.socialSign(user);
-        const oldRefreshToken = await userService.getRefreshToken(client, user.id)
+        const oldRefreshToken = await userService.getRefreshToken(client, user.id);
         if (oldRefreshToken) {
           await userService.updateRefreshToken(client, user.id, refreshtoken);
         } else {
-          await userService.addRefreshToken(client, user.id, refreshtoken)
+          await userService.addRefreshToken(client, user.id, refreshtoken);
         }
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken, refreshtoken }));
       }
     }
     if (provider == 'apple') {
+      let appleUser;
       const getAppleUserBySocialtoken = async appleAccessToken => {
         //애플 토큰 해독해서 유저정보 확인
         try {
-          const appleUser = jwt.decode(appleAccessToken);
+          appleUser = jwt.decode(appleAccessToken);
           if (appleUser.email_verified == 'false') return null;
+          console.log(appleUser);
           return appleUser;
         } catch (err) {
           return null;
@@ -72,11 +74,11 @@ const authSocialLogin = async (req, res) => {
       } else {
         const user = await userService.addSocialUser(client, name, provider, userData.sub, fcm, appleUser.email);
         const { accesstoken, refreshtoken } = jwtHandlers.socialSign(user);
-        const oldRefreshToken = await userService.getRefreshToken(client, user.id)
+        const oldRefreshToken = await userService.getRefreshToken(client, user.id);
         if (oldRefreshToken) {
           await userService.updateRefreshToken(client, user.id, refreshtoken);
         } else {
-          await userService.addRefreshToken(client, user.id, refreshtoken)
+          await userService.addRefreshToken(client, user.id, refreshtoken);
         }
         return res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.CREATED_USER, { user, accesstoken, refreshtoken }));
       }
@@ -95,15 +97,15 @@ const authSocialLogin = async (req, res) => {
 const authSignup = async (req, res) => {
   const { accesstoken } = req.headers;
   const { name, nickname } = req.body;
-  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   if (!name || !nickname) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   let client;
   const decodedToken = jwtHandlers.verify(accesstoken);
   if (decodedToken == TOKEN_INVALID) {
-    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   }
   if (decodedToken == TOKEN_EXPIRED) {
-    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, '만료된 토큰입니다.'));
   }
   const userId = decodedToken.id;
 
@@ -172,12 +174,11 @@ const authLogin = async (req, res) => {
     let user = await userService.returnUser(client, email, password);
     if (!user) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.LOGIN_FAIL));
     const { accesstoken, refreshtoken } = jwtHandlers.sign(user);
-    const oldRefreshToken = await userService.getRefreshToken(client, user.id)
+    const oldRefreshToken = await userService.getRefreshToken(client, user.id);
     if (oldRefreshToken) {
       await userService.updateRefreshToken(client, user.id, refreshtoken);
-    }
-    else {
-      await userService.addRefreshToken(client, user.id, refreshtoken)
+    } else {
+      await userService.addRefreshToken(client, user.id, refreshtoken);
     }
     if (user.fcm != fcm) {
       user = await userService.updateUserDevice(client, user.id, fcm);
@@ -199,14 +200,14 @@ const authLogin = async (req, res) => {
 //회원탈퇴
 const authWithdrawal = async (req, res) => {
   const { accesstoken } = req.headers;
-  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+  if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   let client;
   const decodedToken = jwtHandlers.verify(accesstoken);
   if (decodedToken == TOKEN_INVALID) {
-    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN))
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   }
   if (decodedToken == TOKEN_EXPIRED) {
-    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, "만료된 토큰입니다."))
+    return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, '만료된 토큰입니다.'));
   }
   const userId = decodedToken.id;
   if (typeof userId == 'undefined') {
@@ -250,7 +251,7 @@ const getRefreshToken = async (req, res) => {
       accesstoken,
       refreshtoken,
     };
-    return res.status(statusCode.OK).send(util.success(statusCode.OK, "토큰 갱신", data));
+    return res.status(statusCode.OK).send(util.success(statusCode.OK, '토큰 갱신', data));
   } catch (error) {
     console.log(error);
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));

@@ -50,7 +50,6 @@ const authSocialLogin = async (req, res) => {
         //애플 토큰 해독해서 유저정보 확인
         try {
           appleUser = jwt.decode(appleAccessToken);
-          console.log(appleUser);
           if (appleUser.email_verified == 'false') return null;
           return appleUser;
         } catch (err) {

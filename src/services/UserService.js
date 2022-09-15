@@ -94,7 +94,6 @@ const getKakaoUserBySocialtoken = async (client, socialtoken) => {
     },
   });
 
-  console.log(response.data);
   return response.data;
 };
 
@@ -124,15 +123,15 @@ const addSocialUser = async (client, name, provider, socialId, fcm, email) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
-const addUserInfo = async (client, userId, name, nickname) => {
+const addUserInfo = async (client, userId, nickname) => {
   const { rows } = await client.query(
     `
     UPDATE "user"
-    SET nickname = $3, username = $2
+    SET nickname = $2
     WHERE id = $1
     RETURNING *
     `,
-    [userId, name, nickname],
+    [userId, nickname],
   );
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };

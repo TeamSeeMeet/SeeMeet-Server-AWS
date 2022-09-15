@@ -50,14 +50,15 @@ const authSocialLogin = async (req, res) => {
         //애플 토큰 해독해서 유저정보 확인
         try {
           appleUser = jwt.decode(appleAccessToken);
-          if (appleUser.email_verified == 'false') return null;
           console.log(appleUser);
+          if (appleUser.email_verified == 'false') return null;
           return appleUser;
         } catch (err) {
           return null;
         }
       };
       const userData = await getAppleUserBySocialtoken(socialtoken);
+      console.log(userData);
       let exuser = await userService.getUserBySocialId(client, userData.sub);
       if (exuser) {
         if (exuser.isDeleted == false) {
@@ -96,9 +97,9 @@ const authSocialLogin = async (req, res) => {
 
 const authSignup = async (req, res) => {
   const { accesstoken } = req.headers;
-  const { name, nickname } = req.body;
+  const { nickname } = req.body;
   if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
-  if (!name || !nickname) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
+  if (!nickname) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   let client;
   const decodedToken = jwtHandlers.verify(accesstoken);
   if (decodedToken == TOKEN_INVALID) {
@@ -122,7 +123,7 @@ const authSignup = async (req, res) => {
         return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_NICKNAME));
       }
     }
-    const user = await userService.addUserInfo(client, userId, name, nickname);
+    const user = await userService.addUserInfo(client, userId, nickname);
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.UPDATD_USER, user));
   } catch (error) {
     console.log(error);

@@ -1,7 +1,8 @@
 const e = require('express');
 const jwt = require('jsonwebtoken');
 const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
-
+const axios = require('axios');
+const qs = require('qs');
 // JWT를 발급/인증할 떄 필요한 secretKey를 설정합니다. 값은 .env로부터 불러옵니다.
 const secretKey = process.env.JWT_SECRET;
 const options = {
@@ -14,7 +15,7 @@ const refreshOption = {
   algorithm: 'HS256',
   expiresIn: '90d', //90일동안 토큰 유효
   issuer: 'wesopt',
-}
+};
 
 // id, email, name, idFirebase가 담긴 JWT를 발급합니다.
 const sign = user => {
@@ -26,7 +27,7 @@ const sign = user => {
 
   const result = {
     accesstoken: jwt.sign(payload, secretKey, options),
-    refreshtoken: jwt.sign(payload, secretKey, refreshOption)
+    refreshtoken: jwt.sign(payload, secretKey, refreshOption),
   };
   return result;
 };
@@ -40,7 +41,7 @@ const socialSign = user => {
 
   const result = {
     accesstoken: jwt.sign(payload, secretKey, options),
-    refreshtoken: jwt.sign(payload, secretKey, refreshOption)
+    refreshtoken: jwt.sign(payload, secretKey, refreshOption),
   };
   return result;
 };
@@ -58,7 +59,7 @@ const verify = token => {
       console.log('invalid token');
       return TOKEN_INVALID;
     } else {
-      console.log(err.message)
+      console.log(err.message);
       console.log('what?');
       return 9999;
     }
@@ -67,8 +68,60 @@ const verify = token => {
   return decoded;
 };
 
+const makeJWT = () => {
+  let privateKey = process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, '\n');
+  let token = jwt.sign(
+    {
+      iss: process.env.APPLE_TEAMID,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 120,
+      aud: 'https://appleid.apple.com',
+      sub: process.env.APPLE_CLIENTID,
+    },
+    privateKey,
+    {
+      algorithm: 'ES256',
+      header: {
+        alg: 'ES256',
+        kid: process.env.APPLE_KEYID,
+      },
+    },
+  );
+  console.log(token);
+  return token;
+};
+
+const getRefreshToken = async code => {
+  // const { code } = req.query.code;
+  const client_secret = makeJWT();
+  try {
+    let refresh_token;
+    let data = {
+      code: code,
+      client_id: process.env.APPLE_CLIENTID,
+      client_secret: client_secret,
+      grant_type: 'authorization_code',
+    };
+    await axios
+      .post(`https://appleid.apple.com/auth/token`, qs.stringify(data), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+      .then(async res => {
+        refresh_token = String(res.data.refresh_token);
+      });
+
+    return refresh_token;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   sign,
   socialSign,
   verify,
+  makeJWT,
+  getRefreshToken,
 };

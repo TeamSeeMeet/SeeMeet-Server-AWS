@@ -8,4 +8,5 @@ router.post('/', auth.signUp);
 router.post('/login', auth.authLogin);
 router.put('/withdrawal', auth.authWithdrawal);
 router.post('/refresh', auth.getRefreshToken);
+router.post('/test', auth.revokeApple);
 module.exports = router;

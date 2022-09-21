@@ -8,7 +8,8 @@ const { send } = require('../modules/slack');
 const jwt = require('jsonwebtoken');
 const { TOKEN_INVALID, TOKEN_EXPIRED } = require('../modules/jwt');
 const e = require('express');
-
+const axios = require('axios');
+const qs = require('qs');
 const authSocialLogin = async (req, res) => {
   const { fcm, socialtoken, provider, name } = req.body;
   let client;
@@ -50,6 +51,7 @@ const authSocialLogin = async (req, res) => {
         //애플 토큰 해독해서 유저정보 확인
         try {
           appleUser = jwt.decode(appleAccessToken);
+          console.log(appleUser);
           if (appleUser.email_verified == 'false') return null;
           return appleUser;
         } catch (err) {
@@ -199,6 +201,7 @@ const authLogin = async (req, res) => {
 
 //회원탈퇴
 const authWithdrawal = async (req, res) => {
+  const code = req.query.code;
   const { accesstoken } = req.headers;
   if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   let client;
@@ -216,9 +219,28 @@ const authWithdrawal = async (req, res) => {
   try {
     client = await db.connect(req);
     const user = await userService.userWithdrawal(client, userId);
-
     if (!user) {
       return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NO_USER));
+    } else if (user.provider === 'apple') {
+      const client_secret = jwtHandlers.makeJWT();
+      const refresh_token = await jwtHandlers.getRefreshToken(code);
+
+      let data = {
+        token: refresh_token,
+        client_id: process.env.APPLE_CLIENTID,
+        client_secret: client_secret,
+        token_type_hint: 'refresh_token',
+      };
+
+      const response = await axios
+        .post(`https://appleid.apple.com/auth/revoke`, qs.stringify(data), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        })
+        .then(async res => {
+          console.log(res.data);
+        });
     }
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.DELETE_USER, user));
   } catch (error) {
@@ -260,6 +282,45 @@ const getRefreshToken = async (req, res) => {
   }
 };
 
+const revokeApple = async (req, res) => {
+  const { socialToken } = req.body;
+  // if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
+  let client;
+  const qs = require('qs');
+
+  try {
+    client = await db.connect(req);
+    const client_secret = jwtHandlers.makeJWT();
+    let data = {
+      token: socialToken,
+      client_id: 'com.ios.seemeet',
+      client_secret: client_secret,
+      token_type_hint: 'access_token',
+    };
+
+    return axios
+      .post(`https://appleid.apple.com/auth/revoke`, qs.stringify(data), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+      .then(async res => {
+        console.log(res.data);
+        response.send('Complete');
+      });
+    // const response = await axios.post('https://appleid.apple.com/auth/revoke', {
+    //   client_id: 'com.ios.seemeet',
+    //   client_secret: jwtHandlers.makeJWT,
+    //   token: socialToken,
+    // });
+    return res.status(statusCode.OK).send(util.success(statusCode.OK, '애플 revoke test'));
+  } catch (error) {
+    console.log(error);
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, responseMessage.INTERNAL_SERVER_ERROR));
+  } finally {
+    client.release();
+  }
+};
 module.exports = {
   authSocialLogin,
   authSignup,
@@ -267,4 +328,5 @@ module.exports = {
   authLogin,
   authWithdrawal,
   getRefreshToken,
+  revokeApple,
 };

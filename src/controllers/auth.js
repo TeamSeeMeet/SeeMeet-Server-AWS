@@ -98,7 +98,7 @@ const authSocialLogin = async (req, res) => {
 
 const authSignup = async (req, res) => {
   const { accesstoken } = req.headers;
-  const { nickname } = req.body;
+  const { nickname, name } = req.body;
   if (!accesstoken) return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, responseMessage.TOKEN));
   if (!nickname) return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.NULL_VALUE));
   let client;
@@ -124,7 +124,7 @@ const authSignup = async (req, res) => {
         return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, responseMessage.ALREADY_NICKNAME));
       }
     }
-    const user = await userService.addUserInfo(client, userId, nickname);
+    const user = await userService.addUserInfo(client, userId, nickname, name);
     res.status(statusCode.OK).send(util.success(statusCode.OK, responseMessage.UPDATD_USER, user));
   } catch (error) {
     console.log(error);

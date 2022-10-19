@@ -123,15 +123,15 @@ const addSocialUser = async (client, name, provider, socialId, fcm, email) => {
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
 
-const addUserInfo = async (client, userId, nickname) => {
+const addUserInfo = async (client, userId, nickname, name) => {
   const { rows } = await client.query(
     `
     UPDATE "user"
-    SET nickname = $2
+    SET nickname = $2, username = $3
     WHERE id = $1
     RETURNING *
     `,
-    [userId, nickname],
+    [userId, nickname, name],
   );
   return convertSnakeToCamel.keysToCamel(rows[0]);
 };
